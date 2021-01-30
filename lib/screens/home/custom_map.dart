@@ -123,16 +123,7 @@ class CustomMapState extends State<CustomMap> {
                             )),
                         SizedBox(
                           width: 5,
-                        ),
-                        RaisedButton(
-                            color: Colors.black54,
-                            onPressed: () {},
-                            child: Text(
-                              'My Location',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            )),
+                        ),                        
                         SizedBox(
                           width: 5,
                         ),

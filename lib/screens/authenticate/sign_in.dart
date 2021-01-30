@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ufr/services/auth.dart';
-import 'package:ufr/shared/modules.dart';
 import 'package:ufr/shared/loading.dart';
 import 'package:flutter/material.dart';
 
@@ -28,11 +27,10 @@ class _SignInState extends State<SignIn> {
     return _loading
         ? Loading()
         : Scaffold(
-            backgroundColor: Colors.blue[100],
             appBar: AppBar(
               backgroundColor: Colors.blue[400],
               elevation: 0.0,
-              title: Text('Sign in to ufr'),
+              title: Text('Sign in'),
               actions: <Widget>[
                 FlatButton.icon(
                   icon: Icon(Icons.person),
@@ -49,10 +47,13 @@ class _SignInState extends State<SignIn> {
                   children: <Widget>[
                     SizedBox(height: 20.0),
                     TextFormField(
-                      decoration:
-                          textInputDecoration.copyWith(hintText: 'email'),
+                      decoration: InputDecoration(
+                  labelText: 'email',
+                  hintText: 'Enter your email address',
+                  hintStyle: TextStyle(fontSize: 12.0, color: Colors.grey),
+                ),                      
                       validator: (val) => (val != null && val.isEmpty)
-                          ? 'Enter an email'
+                          ? 'Enter a valid email address'
                           : null,
                       onChanged: (val) {
                         setState(() => _email = val);
@@ -61,8 +62,11 @@ class _SignInState extends State<SignIn> {
                     SizedBox(height: 20.0),
                     TextFormField(
                       obscureText: true,
-                      decoration:
-                          textInputDecoration.copyWith(hintText: 'password'),
+                      decoration: InputDecoration(
+                  labelText: 'Password',
+                  hintText: 'Enter your password',
+                  hintStyle: TextStyle(fontSize: 12.0, color: Colors.grey),
+                ),                     
                       validator: (val) => (val != null && val.length < 6)
                           ? 'Enter a password 6+ chars long'
                           : null,

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:ufr/models/report.dart';
 import 'package:ufr/models/user.dart';
 import 'package:ufr/screens/home/custom_map.dart';
 import 'package:ufr/services/database.dart';
 import 'package:provider/provider.dart';
+import 'package:ufr/shared/constants.dart';
 
 class ReportForm extends StatefulWidget {
   final String reportId;
@@ -30,78 +32,12 @@ class _ReportFormState extends State<ReportForm> {
   int _reportDiameter;
   String _reportCause;
 
-  static const List<int> _diameterList = [
-    50,
-    63,
-    75,
-    80,
-    100,
-    110,
-    125,
-    150,
-    180,
-    200,
-    250,
-    300,
-    350,
-    400,
-    450,
-    500,
-    550,
-    600,
-    650,
-    700,
-    750,
-    800,
-    850,
-    900,
-    950,
-    1000,
-    1050,
-    1100,
-    1150,
-    1200,
-    1250,
-    1300,
-    1350,
-    1400,
-    1450,
-    1500,
-    1550,
-    1600,
-    1650,
-    1700,
-    1750,
-    1800,
-    1850,
-    1900,
-    1950,
-    2000,
-    2050,
-    2100,
-    2150,
-    2200,
-    2250,
-    2300,
-    2350
-  ];
-  static const List<String> _materialList = ['GI', 'ST', 'DI', 'PVC', 'HDPE'];
-  static const List<String> _causeList = [
-    'High Pressure',
-    'Negative Pressure',
-    'Hit by Mistake',
-    'Old Pipe',
-    'Bad Installation'
-  ];
-
   _ReportFormState(this._reportId);
 
   @override
   void initState() {
-
-    if (_reportId != null) _getExistingRecord();
+    if (_reportId != null) _getExistingReport();
     super.initState();
-
   }
 
   @override
@@ -111,7 +47,7 @@ class _ReportFormState extends State<ReportForm> {
     super.dispose();
   }
 
-  void _getExistingRecord() {
+  void _getExistingReport() {
     try {
       DatabaseService().getReport(_reportId).then((value) {
         setState(() {
@@ -126,17 +62,17 @@ class _ReportFormState extends State<ReportForm> {
                   " , " +
                   value.locationGeoPoint.longitude.toString()
               : '';
-          if (_materialList.contains(value.material))
-          _reportMaterial = value.material;
+          if (Constants.materialList.contains(value.material))
+            _reportMaterial = value.material;
 
-          if (_diameterList.contains(value.diameter))
-          _reportDiameter = value.diameter;
+          if (Constants.diameterList.contains(value.diameter))
+            _reportDiameter = value.diameter;
 
-          if (_causeList.contains(value.cause))
-          _reportCause = value.cause;
+          if (Constants.causeList.contains(value.cause))
+            _reportCause = value.cause;
         });
       });
-   } on Exception catch (e, st) {
+    } on Exception catch (e, st) {
       AlertDialog(
           title: Text("Error"), content: Text(e.toString() + st.toString()));
       //return createErrorWidget(e, st);
@@ -191,6 +127,7 @@ class _ReportFormState extends State<ReportForm> {
 
   @override
   Widget build(BuildContext context) {
+    //SystemChrome.setEnabledSystemUIOverlays([]);
     return Scaffold(
       appBar: AppBar(
         title: Text('Report Information'),
@@ -223,9 +160,9 @@ class _ReportFormState extends State<ReportForm> {
                         TimeOfDay tm = await showTimePicker(
                             context: context, initialTime: TimeOfDay.now());
                         if (tm != null) {
-                          setState(() => _reportTimeStamp = Timestamp.fromDate(
-                              DateTime(dt.year, dt.month, dt.day, tm.hour,
-                                  tm.minute)));
+                          setState(() => _reportTimeStamp =
+                              Timestamp.fromDate(DateTime(dt.year, dt.month,
+                                  dt.day, tm.hour, tm.minute)));
                         }
                       }
                     })
@@ -266,7 +203,7 @@ class _ReportFormState extends State<ReportForm> {
                       _reportMaterial = value;
                     });
                   },
-                  items: _materialList.map((material) {
+                  items: Constants.materialList.map((material) {
                     return DropdownMenuItem(
                       child: new Text(material),
                       value: material,
@@ -274,14 +211,15 @@ class _ReportFormState extends State<ReportForm> {
                   }).toList()),
               SizedBox(height: 10.0),
               DropdownButton(
-                  hint: Text('Specify diameter'), // Not necessary for Option 1
+                  hint:
+                      Text('Specify diameter'), // Not necessary for Option 1
                   value: _reportDiameter,
                   onChanged: (value) {
                     setState(() {
                       _reportDiameter = value;
                     });
                   },
-                  items: _diameterList.map((diameter) {
+                  items: Constants.diameterList.map((diameter) {
                     return DropdownMenuItem(
                       child: new Text(diameter.toString()),
                       value: diameter,
@@ -296,7 +234,7 @@ class _ReportFormState extends State<ReportForm> {
                       _reportCause = value;
                     });
                   },
-                  items: _causeList.map((cause) {
+                  items: Constants.causeList.map((cause) {
                     return DropdownMenuItem(
                       child: new Text(cause.toString()),
                       value: cause,
@@ -331,5 +269,3 @@ class _ReportFormState extends State<ReportForm> {
     );
   }
 }
-
-//height: MediaQuery.of(context).size.height * 0.2,

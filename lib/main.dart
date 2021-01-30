@@ -8,38 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:ufr/models/user.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-//Check this page for initializing firestore while loading
-//https://stackoverflow.com/questions/63492211/no-firebase-app-default-has-been-created-call-firebase-initializeapp-in
-
-// void main() async {
-//   try {
-//     WidgetsFlutterBinding.ensureInitialized();
-//     await Firebase.initializeApp().catchError((e) {
-//       print('****** : ' + e.toString());
-//     });
-
-//     ErrorWidget.builder = (FlutterErrorDetails details) {
-//       return Material(
-//         child: Container(
-//           color: Colors.purple,
-//           alignment: Alignment.center,
-//           child: Text(
-//             'Something went wrong!',
-//             style: TextStyle(fontSize: 20, color: Colors.white),
-//           ),
-//         ),
-//       );
-//     };
-
-//     runApp(MyApp());
-//   } on Exception catch (e) {
-//     print('****** : ' + e.toString());
-//     //AlertDialog(
-//       //  title: Text("Error"), content: Text(e.toString() + st.toString()));
-//     //return createErrorWidget(e, st);
-//   }
-// }
-
 void main() async {
   try {
     print('');
@@ -48,14 +16,14 @@ void main() async {
 
     FlutterError.onError = (FlutterErrorDetails details) {
       //this line prints the default flutter gesture caught exception in console
-      //FlutterError.dumpErrorToConsole(details);
+      FlutterError.dumpErrorToConsole(details);
       print("Error From INSIDE FRAME_WORK");
       print("----------------------");
       print("Error :  ${details.exception}");
       print("StackTrace :  ${details.stack}");
     };
 
-      //Displayed instead of read screen
+      //Displayed instead of red screen
       ErrorWidget.builder = (FlutterErrorDetails details) {
       return Material(
         child: Padding(
@@ -99,9 +67,9 @@ class MyApp extends StatelessWidget {
           return null;
         },
         child: MaterialApp(
-          theme: new ThemeData(
-            primarySwatch: Colors.blue,
-          ),
+          // theme: new ThemeData(
+          //   primarySwatch: Colors.blue,
+          // ),
           debugShowCheckedModeBanner: false,
           home: Wrapper(),
         ),

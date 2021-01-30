@@ -30,13 +30,13 @@ dependencies:
   cupertino_icons: ^1.0.0
   
   firebase_core: ^0.7.0
-  firebase_auth: ^0.20.0
+  firebase_auth: ^0.20.0+1
   cloud_firestore: ^0.16.0
   provider: ^4.3.2+3
   flutter_spinkit: ^4.1.2+1
   intl: ^0.16.1
-  google_maps_flutter: ^1.0.3
-  location: ^3.0.2
+  google_maps_flutter: ^1.1.1
+  location: ^3.2.4
   ext_storage: ^1.0.3
   permission_handler: ^5.0.1+1
 

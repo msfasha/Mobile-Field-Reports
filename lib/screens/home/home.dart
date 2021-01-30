@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ufr/screens/home/home_drawer.dart';
@@ -7,10 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:ufr/models/user.dart';
 import 'package:ufr/models/report.dart';
 import 'package:ufr/screens/home/report_list.dart';
-import 'package:ufr/services/auth.dart';
 import 'package:ufr/services/database.dart';
 
 import 'report_form.dart';
+
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -24,8 +23,7 @@ class Home extends StatelessWidget {
         return [];
       },
       child: Scaffold(
-        drawer: HomeDrawer(),
-        backgroundColor: Colors.blue[50],
+        drawer: SafeArea(child: HomeDrawer()),
         appBar: AppBar(
           leading: Builder(
             builder: (BuildContext context) {
@@ -38,17 +36,22 @@ class Home extends StatelessWidget {
               );
             },
           ),
-          title: Text(user.utilityName),
+          //title: Text(user.utilityName),
           backgroundColor: Colors.blue[400],
           elevation: 0.0,
           actions: <Widget>[
-            FlatButton.icon(
-              icon: Icon(Icons.person),
-              label: Text('logout'),
-              onPressed: () async {
-                await AuthService().signOut();
-              },
-            ),
+            IconButton(
+                icon: Icon(Icons.card_giftcard),
+                tooltip: 'View as tiles',
+                onPressed: () async {}),
+            IconButton(
+                icon: Icon(Icons.table_view),
+                tooltip: 'View as table',
+                onPressed: () async {}),
+            IconButton(
+                icon: Icon(Icons.map),
+                tooltip: 'View as map',
+                onPressed: () async {}),
           ],
         ),
         body: Container(
@@ -63,7 +66,8 @@ class Home extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             try {
-              Navigator.push(context,MaterialPageRoute(builder: (context) => ReportForm()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ReportForm()));
             } on Exception catch (e, st) {
               AlertDialog(
                   title: Text("Error"),
@@ -78,5 +82,3 @@ class Home extends StatelessWidget {
     );
   }
 }
-
-

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:ufr/services/auth.dart';
 import 'package:ufr/services/database.dart';
 import 'package:ufr/shared/modules.dart';
@@ -45,11 +46,11 @@ class _RegisterState extends State<Register> {
     return _loading
         ? Loading()
         : Scaffold(
-            backgroundColor: Colors.blue[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
               backgroundColor: Colors.blue[400],
               elevation: 0.0,
-              title: Text('Sign up to MWI ME'),
+              title: Text('Sign up'),
               actions: <Widget>[
                 FlatButton.icon(
                   icon: Icon(Icons.person),
@@ -65,8 +66,11 @@ class _RegisterState extends State<Register> {
                 child: Column(
                   children: <Widget>[
                     TextFormField(
-                      decoration:
-                          textInputDecoration.copyWith(hintText: 'email'),
+                         decoration: InputDecoration(
+                  labelText: 'email',
+                  hintText: 'Enter a valid email address',
+                  hintStyle: TextStyle(fontSize: 12.0, color: Colors.grey),
+                ),                       
                       validator: validateEmail,
                       keyboardType: TextInputType.emailAddress,
                       onChanged: (val) {
@@ -75,8 +79,11 @@ class _RegisterState extends State<Register> {
                     ),
                     SizedBox(height: 20.0),
                     TextFormField(
-                      decoration:
-                          textInputDecoration.copyWith(hintText: 'password'),
+                      decoration: InputDecoration(
+                  labelText: 'Password',
+                  hintText: 'Enter a valid password',
+                  hintStyle: TextStyle(fontSize: 12.0, color: Colors.grey),
+                ), 
                       obscureText: true,
                       validator: (val) => (val != null && val.length < 6)
                           ? 'Enter a password 6+ chars long'
@@ -87,8 +94,11 @@ class _RegisterState extends State<Register> {
                     ),
                     SizedBox(height: 20.0),
                     TextFormField(
-                      decoration:
-                          textInputDecoration.copyWith(hintText: 'Person Name'),
+                      decoration: InputDecoration(
+                  labelText: 'name',
+                  hintText: 'Enter your name',
+                  hintStyle: TextStyle(fontSize: 12.0, color: Colors.grey),
+                ), 
                       validator: (val) => (val != null && val.length < 6)
                           ? 'Enter a valid name'
                           : null,
@@ -106,15 +116,19 @@ class _RegisterState extends State<Register> {
                             );
                           else {
                             return Container(
-                              child: DropdownButton(
-                                  value: _utilityId,
+                              alignment: Alignment.centerLeft,
+                              child: DropdownButtonFormField(
+                                decoration: InputDecoration(
+                                labelText: 'Utility',
+                                hintText: 'Select utility',
+                                hintStyle: TextStyle(fontSize: 12.0, color: Colors.grey)),
+                                value: _utilityId,
                                   //isDense: true,
                                   onChanged: (value) {
                                     setState(() {
                                       _utilityId = int.parse(value.toString());
                                     });
                                   },
-                                  hint: Text('Select Utility'),
                                   items: snapshot.data.docs
                                       .map((document) => DropdownMenuItem(
                                           // value: document.data['utility_id'],

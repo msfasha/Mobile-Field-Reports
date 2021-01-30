@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:ufr/models/user.dart';
+import 'package:ufr/services/auth.dart';
 import 'package:ufr/shared/export.dart';
 import 'package:ufr/shared/modules.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +40,7 @@ class HomeDrawer extends StatelessWidget {
             onTap: () {
               showADialog(context, "Under Construction");
             },
-          ),
+          ),         
           ListTile(
             leading: Icon(Icons.save),
             title: Text('Export to CSV'),
@@ -66,15 +67,24 @@ class HomeDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: Icon(Icons.person),
+            title: Text('Logout'),
+            onTap: () async {
+                await AuthService().signOut();
+              },            
+          ),
+          ListTile(
             leading: Icon(Icons.power_settings_new),
             title: Text('Exit'),
-            onTap: () {
+            onTap: () async {
+              SystemNavigator.pop();                
               if (Platform.isAndroid) {
-                SystemNavigator.pop();
+                await AuthService().signOut();
                 Future.delayed(const Duration(milliseconds: 1000), () {
                   exit(0);
                 });
               } else if (Platform.isIOS) {
+                await AuthService().signOut();
                 exit(0);
               }
             },

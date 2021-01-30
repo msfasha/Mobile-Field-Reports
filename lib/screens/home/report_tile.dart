@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ufr/screens/home/report_form.dart';
 import 'package:ufr/services/database.dart';
-import 'package:ufr/shared/modules.dart';
 
 class ReportTile extends StatelessWidget {
   final String timeTxt;
@@ -30,7 +30,9 @@ class ReportTile extends StatelessWidget {
                 icon: Icon(Icons.edit),
                 tooltip: 'Edit report information',
                 onPressed: () {
-                  showReportPanel(context: context, reportId: reportId);
+                  Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ReportForm(reportId :reportId)));
+                  //showReportPanel(context: context, reportId: reportId);
                 },
               ),
               IconButton(

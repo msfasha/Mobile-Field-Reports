@@ -64,3 +64,11 @@ class Constants {
     'Bad Installation'
   ];
 }
+
+enum HomeViewTypeEnum { 
+   ViewAsTiles, 
+   ViewAsRows, 
+   ViewAsMap,    
+}
+
+

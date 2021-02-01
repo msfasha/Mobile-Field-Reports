@@ -40,13 +40,13 @@ class HomeDrawer extends StatelessWidget {
             onTap: () {
               showADialog(context, "Under Construction");
             },
-          ),         
+          ),
           ListTile(
             leading: Icon(Icons.save),
             title: Text('Export to CSV'),
             onTap: () async {
-              try {                
-                String result = await ExportFromFireStore.exportToCSV();                
+              try {
+                String result = await ExportFromFireStore.exportToCSV();
                 Scaffold.of(context).showSnackBar(SnackBar(
                   content: Text(result),
                   duration: Duration(milliseconds: 1500),
@@ -70,14 +70,14 @@ class HomeDrawer extends StatelessWidget {
             leading: Icon(Icons.person),
             title: Text('Logout'),
             onTap: () async {
-                await AuthService().signOut();
-              },            
+              await AuthService().signOut();
+            },
           ),
           ListTile(
             leading: Icon(Icons.power_settings_new),
             title: Text('Exit'),
             onTap: () async {
-              SystemNavigator.pop();                
+              SystemNavigator.pop();
               if (Platform.isAndroid) {
                 await AuthService().signOut();
                 Future.delayed(const Duration(milliseconds: 1000), () {

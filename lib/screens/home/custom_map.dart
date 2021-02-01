@@ -9,10 +9,11 @@ import 'package:location/location.dart';
 class CustomMap extends StatefulWidget {
   final GeoPoint selectedGeoPoint;
 
-  CustomMap({this.selectedGeoPoint});  
+  CustomMap({this.selectedGeoPoint});
 
   @override
-  State<CustomMap> createState() => CustomMapState(selectedGeoPoint: selectedGeoPoint);
+  State<CustomMap> createState() =>
+      CustomMapState(selectedGeoPoint: selectedGeoPoint);
 }
 
 class CustomMapState extends State<CustomMap> {
@@ -23,7 +24,7 @@ class CustomMapState extends State<CustomMap> {
   CameraPosition _cameraPosition;
 
   CustomMapState({this.selectedGeoPoint});
-  
+
   @override
   void initState() {
     super.initState();
@@ -69,7 +70,7 @@ class CustomMapState extends State<CustomMap> {
   }
 
   @override
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text('Select Location'),
@@ -123,7 +124,7 @@ class CustomMapState extends State<CustomMap> {
                             )),
                         SizedBox(
                           width: 5,
-                        ),                        
+                        ),
                         SizedBox(
                           width: 5,
                         ),

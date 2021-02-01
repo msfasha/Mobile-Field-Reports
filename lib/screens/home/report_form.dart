@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:ufr/models/report.dart';
 import 'package:ufr/models/user.dart';
@@ -61,7 +60,7 @@ class _ReportFormState extends State<ReportForm> {
               ? value.locationGeoPoint.latitude.toString() +
                   " , " +
                   value.locationGeoPoint.longitude.toString()
-              : '';
+              : 'Select location from map';
           if (Constants.materialList.contains(value.material))
             _reportMaterial = value.material;
 
@@ -160,9 +159,9 @@ class _ReportFormState extends State<ReportForm> {
                         TimeOfDay tm = await showTimePicker(
                             context: context, initialTime: TimeOfDay.now());
                         if (tm != null) {
-                          setState(() => _reportTimeStamp =
-                              Timestamp.fromDate(DateTime(dt.year, dt.month,
-                                  dt.day, tm.hour, tm.minute)));
+                          setState(() => _reportTimeStamp = Timestamp.fromDate(
+                              DateTime(dt.year, dt.month, dt.day, tm.hour,
+                                  tm.minute)));
                         }
                       }
                     })
@@ -211,8 +210,7 @@ class _ReportFormState extends State<ReportForm> {
                   }).toList()),
               SizedBox(height: 10.0),
               DropdownButton(
-                  hint:
-                      Text('Specify diameter'), // Not necessary for Option 1
+                  hint: Text('Specify diameter'), // Not necessary for Option 1
                   value: _reportDiameter,
                   onChanged: (value) {
                     setState(() {

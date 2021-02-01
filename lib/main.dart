@@ -67,9 +67,11 @@ class MyApp extends StatelessWidget {
           return null;
         },
         child: MaterialApp(
-          // theme: new ThemeData(
-          //   primarySwatch: Colors.blue,
-          // ),
+        
+        theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
           debugShowCheckedModeBanner: false,
           home: Wrapper(),
         ),

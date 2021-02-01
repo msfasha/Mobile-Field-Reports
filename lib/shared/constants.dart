@@ -65,10 +65,10 @@ class Constants {
   ];
 }
 
-enum HomeViewTypeEnum { 
+enum ReportsViewTypeEnum { 
    ViewAsTiles, 
    ViewAsRows, 
-   ViewAsMap,    
+   ViewInMap,    
 }
 
 

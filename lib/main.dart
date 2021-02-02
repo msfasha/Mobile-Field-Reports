@@ -10,7 +10,6 @@ import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   try {
-    print('');
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
 

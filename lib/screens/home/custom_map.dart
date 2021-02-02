@@ -26,10 +26,10 @@ class CustomMapState extends State<CustomMap> {
   CustomMapState({this.selectedGeoPoint});
 
   @override
-  void initState() {
-    super.initState();
+  void initState() {    
     _setInitialCameraPosition();
     _checkLocationPermission();
+    super.initState();
   }
 
   void _setInitialCameraPosition() {

@@ -7,6 +7,8 @@ import 'package:ufr/models/user.dart';
 import 'package:ufr/models/report.dart';
 import 'package:ufr/screens/home/report_list.dart';
 import 'package:ufr/services/database.dart';
+import 'package:ufr/shared/constants.dart';
+import 'package:ufr/shared/modules.dart';
 
 import 'report_form.dart';
 
@@ -16,6 +18,15 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  ReportsViewTypeChangeNotifier _changeNotifier;
+
+  @override
+  void initState() {
+
+    _changeNotifier = ReportsViewTypeChangeNotifier();
+    _changeNotifier.changeView(ReportsViewTypeEnum.ViewAsTiles);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,19 +56,42 @@ class _HomeState extends State<Home> {
           //title: Text(user.utilityName),
           backgroundColor: Colors.blue[400],
           elevation: 0.0,
-          actions: <Widget>[
-            
-          ],
+          actions: <Widget>[],
         ),
-        body: Container(
-          decoration: BoxDecoration(
-            // image: DecorationImage(
-            //   image: AssetImage('assets/images/water_pg.png'),
-            //   fit: BoxFit.cover,
-            // ),
+        body: Column(children: [
+          ButtonBar(
+            alignment: MainAxisAlignment.center,
+            buttonHeight: 10,
+            children: <Widget>[
+              FlatButton(
+                  child: Text('Tiles'),
+                  color: Colors.blue,
+                  onPressed: () {
+                    _changeNotifier.changeView(ReportsViewTypeEnum.ViewAsTiles);
+                  }),
+              FlatButton(
+                child: Text('Rows'),
+                color: Colors.blue,
+                onPressed: () {
+                  setState(() {
+                    _changeNotifier.changeView(ReportsViewTypeEnum.ViewAsRows);
+                  });
+                },
+              ),
+              FlatButton(
+                child: Text('Map'),
+                color: Colors.blue,
+                onPressed: () {
+                  // To do
+                },
+              ),
+            ],
           ),
-          child: ReportsList(),
-        ),       
+          ChangeNotifierProvider(
+            create: (context) => _changeNotifier,
+            child: ReportsList(),
+          ),
+        ]),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             try {

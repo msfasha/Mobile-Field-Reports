@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:ufr/screens/home/report_form.dart';
+import 'package:ufr/shared/constants.dart';
 
 void showReportPanel({BuildContext context, String reportId}) {
   showModalBottomSheet(
@@ -98,4 +99,11 @@ showADialog(BuildContext context, String content) {
         }
         throw '';
       });
+}
+class ReportsViewTypeChangeNotifier extends ChangeNotifier {
+  ReportsViewTypeEnum reportViewType;
+  void changeView(ReportsViewTypeEnum reportViewType) {
+    this.reportViewType = reportViewType;
+    notifyListeners();
+  }
 }

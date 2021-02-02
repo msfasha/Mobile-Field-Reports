@@ -5,69 +5,37 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ufr/services/database.dart';
 import 'package:ufr/shared/constants.dart';
+import 'package:ufr/shared/modules.dart';
 
 typedef Widget ListingItemCreator(String s1, String s2, String s3);
 
 class ReportsList extends StatefulWidget {
+  ReportsList();
+
   @override
   _ReportsListState createState() => _ReportsListState();
 }
 
 class _ReportsListState extends State<ReportsList> {
-  Widget _mainDisplayWidget;
+  _ReportsListState();
+
+  //Widget _mainDisplayWidget;
   ListingItemCreator _lic;
-  dynamic reports;
 
-  void _toggleViewWidget(ReportsViewTypeEnum reportsViewType) {
-    setState(() {
-      switch (reportsViewType) {
-        case ReportsViewTypeEnum.ViewAsTiles:
-          _lic = _tileWidget;
-          _mainDisplayWidget = _listWidget();
-          // do something
-          break;
-        case ReportsViewTypeEnum.ViewAsRows:
-          _lic = _rowWidget;
-          _mainDisplayWidget = _listWidget();
-          // do something else
-          break;
-
-        case ReportsViewTypeEnum.ViewInMap:
-          // do something else
-          break;
-      }
-    });
-  }
-
-  Widget _listWidget() {
-
-    return Expanded(
-      child: ListView.builder(
-        itemCount: reports.length,
-        padding: EdgeInsets.zero,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          return _lic(
-            DateFormat('yyyy-MM-dd – kk:mm')
-                    .format(reports[index].time.toDate()) ??
-                '',
-            reports[index].address ?? '',
-            reports[index].rid,
-          );
-        },
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
   }
 
   Widget _tileWidget(String timeTxt, String locationTxt, String reportId) {
     return Card(
       margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
       child: ListTile(
-        // leading: CircleAvatar(
-        //   radius: 25.0,
-        //   backgroundColor: Colors.blue,
-        //   backgroundImage: AssetImage('assets/images/water_icon.jpg'),
-        // ),
+        leading: CircleAvatar(
+          radius: 25.0,
+          backgroundColor: Colors.blue,
+          backgroundImage: AssetImage('assets/images/water_icon.jpg'),
+        ),
         title: Text(timeTxt,
             style: TextStyle(
               fontSize: 14,
@@ -170,40 +138,46 @@ class _ReportsListState extends State<ReportsList> {
 
   @override
   Widget build(BuildContext context) {
-    reports = Provider.of<List<Report>>(context);
+    final reports = Provider.of<List<Report>>(context);
     if (reports == null) return Text('');
-    
-    return Column(
-      children: [
-        ButtonBar(
-          alignment: MainAxisAlignment.center,
-          buttonHeight: 10,
-          children: <Widget>[
-            FlatButton(
-              child: Text('Tiles'),
-              color: Colors.blue,
-              onPressed: () {
-                _toggleViewWidget(ReportsViewTypeEnum.ViewAsTiles);
-              },
-            ),
-            FlatButton(
-              child: Text('Rows'),
-              color: Colors.blue,
-              onPressed: () {
-                _toggleViewWidget(ReportsViewTypeEnum.ViewAsRows);
-              },
-            ),
-            FlatButton(
-              child: Text('Map'),
-              color: Colors.blue,
-              onPressed: () {
-                // To do
-              },
-            ),
-          ],
-        ),
-        _mainDisplayWidget ?? Text(''),
-      ],
+
+    return Expanded(
+      child: Consumer<ReportsViewTypeChangeNotifier>(
+          // ignore: missing_return
+          builder: (context, viewType, child) {
+        if (viewType.reportViewType == ReportsViewTypeEnum.ViewAsTiles) {
+          return ListView.builder(
+            itemCount: reports.length,
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return _tileWidget(
+                DateFormat('yyyy-MM-dd – kk:mm')
+                        .format(reports[index].time.toDate()) ??
+                    '',
+                reports[index].address ?? '',
+                reports[index].rid,
+              );
+            },
+          );
+        } else if (viewType.reportViewType == ReportsViewTypeEnum.ViewAsRows) {
+          return ListView.builder(
+            itemCount: reports.length,
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return _rowWidget(
+                DateFormat('yyyy-MM-dd – kk:mm')
+                        .format(reports[index].time.toDate()) ??
+                    '',
+                reports[index].address ?? '',
+                reports[index].rid,
+              );
+            },
+          );
+        } else
+          return Text('');
+      }),
     );
   }
 }

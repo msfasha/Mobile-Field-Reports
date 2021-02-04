@@ -1,16 +1,26 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:ufr/models/user.dart';
-import 'package:ufr/services/auth.dart';
+import 'package:ufr/services/firebase.dart';
 import 'package:ufr/shared/export.dart';
 import 'package:ufr/shared/modules.dart';
 import 'package:provider/provider.dart';
 
-class HomeDrawer extends StatelessWidget {
-  const HomeDrawer({
-    Key key,
-  }) : super(key: key);
+class HomeDrawer extends StatefulWidget {
+  @override
+  _HomeDrawerState createState() => _HomeDrawerState();
+}
+
+class _HomeDrawerState extends State<HomeDrawer> {
+  Widget _exportTitle;
+
+  @override
+  void initState() {
+    _exportTitle = Text('Export to CSV');
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,28 +45,19 @@ class HomeDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Settings'),
-            onTap: () {
-              showADialog(context, "Under Construction");
-            },
-          ),
-          ListTile(
             leading: Icon(Icons.save),
-            title: Text('Export to CSV'),
+            title: _exportTitle,
             onTap: () async {
-              try {
-                String result = await ExportFromFireStore.exportToCSV();
-                Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text(result),
-                  duration: Duration(milliseconds: 1500),
-                ));
-                Navigator.pop(context);
-              } on Exception catch (e) {
-                Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text(e.toString()),
-                    duration: Duration(milliseconds: 1500)));
-              }
+              setState(() {
+                _exportTitle = SpinKitThreeBounce(
+                  color: Colors.blue,
+                  size: 20.0,
+                );
+              });
+              
+              ExportFromFireStore.exportToCSV(user.utilityId, context);
+              
+              Navigator.pop(context);
             },
           ),
           ListTile(
@@ -67,26 +68,25 @@ class HomeDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Logout'),
-            onTap: () async {
-              await AuthService().signOut();
-            },
-          ),
+              leading: Icon(Icons.person),
+              title: Text('Logout'),
+              onTap: () async {
+                await AuthService.signOut();
+              }),
           ListTile(
             leading: Icon(Icons.power_settings_new),
             title: Text('Exit'),
-            onTap: () async {
-              SystemNavigator.pop();
-              if (Platform.isAndroid) {
-                await AuthService().signOut();
-                Future.delayed(const Duration(milliseconds: 1000), () {
+            onTap: () async {              
+                SystemNavigator.pop();
+                if (Platform.isAndroid) {
+                  await AuthService.signOut();
+                  Future.delayed(const Duration(milliseconds: 1000), () {
+                    exit(0);
+                  });
+                } else if (Platform.isIOS) {
+                  await AuthService.signOut();
                   exit(0);
-                });
-              } else if (Platform.isIOS) {
-                await AuthService().signOut();
-                exit(0);
-              }
+                }           
             },
           ),
         ],

@@ -5,9 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "ufr",
+            "name": "ufr release",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "ufr debug",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug"
         }
     ]
 }

@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:ufr/services/auth.dart';
-import 'package:ufr/services/database.dart';
+import 'package:ufr/services/firebase.dart';
 import 'package:ufr/shared/modules.dart';
 import 'package:ufr/shared/loading.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
 
   String _error;
@@ -107,7 +105,7 @@ class _RegisterState extends State<Register> {
                     ),
                     SizedBox(height: 20.0),
                     FutureBuilder<QuerySnapshot>(
-                        future: DatabaseService().utilities,
+                        future: DatabaseService.utilities,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData)
                             return const Center(
@@ -166,7 +164,7 @@ class _RegisterState extends State<Register> {
     try {
       if (_formKey.currentState.validate()) {
         setState(() => _loading = true);
-        dynamic result = await _auth.registerWithEmailAndPassword(
+        dynamic result = await AuthService.registerWithEmailAndPassword(
             _email, _password, _utilityId, _personName);
         if (result == null) {
           setState(() {
@@ -176,7 +174,7 @@ class _RegisterState extends State<Register> {
         }
       }
     } on Exception catch (e) {
-      String errMsg = 'Something went wrong';
+      String errMsg = e.toString();
       if (e is FirebaseAuthException) {
         if (e.code == 'email-already-in-use') {
           errMsg = 'email already in use, try another email';

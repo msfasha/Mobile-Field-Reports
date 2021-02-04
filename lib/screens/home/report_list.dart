@@ -3,8 +3,7 @@ import 'package:ufr/models/report.dart';
 import 'package:ufr/screens/home/report_form.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ufr/services/database.dart';
-import 'package:ufr/shared/constants.dart';
+import 'package:ufr/services/firebase.dart';
 import 'package:ufr/shared/modules.dart';
 
 typedef Widget ListingItemCreator(String s1, String s2, String s3);
@@ -20,7 +19,7 @@ class _ReportsListState extends State<ReportsList> {
   _ReportsListState();
 
   //Widget _mainDisplayWidget;
-  ListingItemCreator _lic;
+  //ListingItemCreator _lic;
 
   @override
   void initState() {
@@ -31,11 +30,13 @@ class _ReportsListState extends State<ReportsList> {
     return Card(
       margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
       child: ListTile(
-        leading: CircleAvatar(
-          radius: 25.0,
-          backgroundColor: Colors.blue,
-          backgroundImage: AssetImage('assets/images/water_icon.jpg'),
-        ),
+        selectedTileColor: Colors.blueGrey,
+        leading: Icon(Icons.photo_library),
+        // leading: CircleAvatar(
+        //   radius: 25.0,
+        //   backgroundColor: Colors.blue,
+        //   backgroundImage: AssetImage('assets/images/water_icon.jpg'),
+        // ),
         title: Text(timeTxt,
             style: TextStyle(
               fontSize: 14,
@@ -52,21 +53,25 @@ class _ReportsListState extends State<ReportsList> {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: Icon(Icons.edit),
-              tooltip: 'Edit report information',
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ReportForm(reportId: reportId)));
-                //showReportPanel(context: context, reportId: reportId);
-              },
-            ),
+                icon: Icon(Icons.edit),
+                tooltip: 'Edit report information',
+                onPressed: () {
+                  DatabaseService.getReport(reportId).then((value) {
+                    Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ReportForm(report: value)))
+                        .catchError((e) {
+                        showSnackBarMessage('Error Occured: ${e.toString()}');
+                      });
+                  });
+                }),
             IconButton(
               icon: Icon(Icons.delete),
               tooltip: 'Delete report',
               onPressed: () {
-                DatabaseService().deleteReport(reportId);
+                DatabaseService.deleteReport(reportId);
               },
             ),
           ],
@@ -78,53 +83,60 @@ class _ReportsListState extends State<ReportsList> {
   Widget _rowWidget(String timeTxt, String locationTxt, String reportId) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 10, right: 10),
-          child: Row(children: [
-            Expanded(
-              flex: 6,
-              child: Text(timeTxt,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Arial',
-                  )),
-            ),
-            Expanded(
-              flex: 4,
-              child: Text(locationTxt,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Arial',
-                  )),
-            ),
-            Expanded(
-              flex: 1,
-              child: IconButton(
-                icon: Icon(Icons.edit),
-                tooltip: 'Edit report information',
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ReportForm(reportId: reportId)));
-                  //showReportPanel(context: context, reportId: reportId);
-                },
+        Container(
+          height: 30,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Row(children: [
+              Expanded(
+                flex: 4,
+                child: Text(timeTxt,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Arial',
+                    )),
               ),
-            ),
-            Expanded(
-              flex: 1,
-              child: IconButton(
-                icon: Icon(Icons.delete),
-                tooltip: 'Delete report',
-                onPressed: () {
-                  DatabaseService().deleteReport(reportId);
-                },
+              Expanded(
+                flex: 6,
+                child: Text(locationTxt,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Arial',
+                    )),
               ),
-            ),
-          ]),
+              Expanded(
+                flex: 1,
+                child: IconButton(
+                    icon: Icon(Icons.edit),
+                    tooltip: 'Edit report information',
+                    onPressed: () async {
+                      try {
+                        Report result =
+                            await DatabaseService.getReport(reportId);
+
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ReportForm(report: result)));
+                      } catch (e) {}
+                    }),
+              ),
+              Expanded(
+                flex: 1,
+                child: IconButton(
+                  icon: Icon(Icons.delete),
+                  tooltip: 'Delete report',
+                  onPressed: () {
+                    print (TestService.deleteRecord());
+                    //DatabaseService.deleteReport(reportId);
+                  },
+                ),
+              ),
+            ]),
+          ),
         ),
         Divider(
           thickness: 1,

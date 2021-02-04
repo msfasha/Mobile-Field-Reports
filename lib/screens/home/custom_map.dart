@@ -4,7 +4,8 @@ import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
+import 'package:ufr/shared/modules.dart';
+//import 'package:location/location.dart';
 
 class CustomMap extends StatefulWidget {
   final GeoPoint selectedGeoPoint;
@@ -18,7 +19,7 @@ class CustomMap extends StatefulWidget {
 
 class CustomMapState extends State<CustomMap> {
   GeoPoint selectedGeoPoint;
-  Location location = new Location();
+  //Location location = new Location();
   Set<Marker> _markers = HashSet<Marker>();
   Completer<GoogleMapController> _controller = Completer();
   CameraPosition _cameraPosition;
@@ -26,7 +27,7 @@ class CustomMapState extends State<CustomMap> {
   CustomMapState({this.selectedGeoPoint});
 
   @override
-  void initState() {    
+  void initState() {
     _setInitialCameraPosition();
     _checkLocationPermission();
     super.initState();
@@ -52,20 +53,20 @@ class CustomMapState extends State<CustomMap> {
   }
 
   void _checkLocationPermission() async {
-    bool _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
-    PermissionStatus _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
+    // bool _serviceEnabled = await location.serviceEnabled();
+    // if (!_serviceEnabled) {
+    //   _serviceEnabled = await location.requestService();
+    //   if (!_serviceEnabled) {
+    //     return;
+    //   }
+    // }
+    // PermissionStatus _permissionGranted = await location.hasPermission();
+    // if (_permissionGranted == PermissionStatus.denied) {
+    //   _permissionGranted = await location.requestPermission();
+    //   if (_permissionGranted != PermissionStatus.granted) {
+    //     return;
+    //   }
+    // }
     //LocationData _selectedLocation = await location.getLocation();
   }
 
@@ -109,10 +110,7 @@ class CustomMapState extends State<CustomMap> {
                             color: Colors.black54,
                             onPressed: () {
                               if (selectedGeoPoint == null) {
-                                Scaffold.of(context).showSnackBar(SnackBar(
-                                  content: Text('No point selected'),
-                                  duration: Duration(milliseconds: 1500),
-                                ));
+                                showSnackBarMessage('No point selected');                                
                               } else
                                 Navigator.pop(context, selectedGeoPoint);
                             },

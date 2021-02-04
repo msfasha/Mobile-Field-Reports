@@ -1,7 +1,7 @@
 class Utility {
-  final int utilityId;
-  final String nativeName;
-  final String foreignName;
+  int utilityId;
+  String nativeName;
+  String foreignName;
 
   Utility({this.utilityId, this.nativeName, this.foreignName});
 }

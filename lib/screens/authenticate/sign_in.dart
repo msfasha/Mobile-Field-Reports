@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:ufr/services/auth.dart';
+import 'package:ufr/services/firebase.dart';
 import 'package:ufr/shared/loading.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +12,6 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
 
   String _error = '';
@@ -48,10 +47,11 @@ class _SignInState extends State<SignIn> {
                     SizedBox(height: 20.0),
                     TextFormField(
                       decoration: InputDecoration(
-                  labelText: 'email',
-                  hintText: 'Enter your email address',
-                  hintStyle: TextStyle(fontSize: 12.0, color: Colors.grey),
-                ),                      
+                        labelText: 'email',
+                        hintText: 'Enter your email address',
+                        hintStyle:
+                            TextStyle(fontSize: 12.0, color: Colors.grey),
+                      ),
                       validator: (val) => (val != null && val.isEmpty)
                           ? 'Enter a valid email address'
                           : null,
@@ -63,10 +63,11 @@ class _SignInState extends State<SignIn> {
                     TextFormField(
                       obscureText: true,
                       decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
-                  hintStyle: TextStyle(fontSize: 12.0, color: Colors.grey),
-                ),                     
+                        labelText: 'Password',
+                        hintText: 'Enter your password',
+                        hintStyle:
+                            TextStyle(fontSize: 12.0, color: Colors.grey),
+                      ),
                       validator: (val) => (val != null && val.length < 6)
                           ? 'Enter a password 6+ chars long'
                           : null,
@@ -99,7 +100,7 @@ class _SignInState extends State<SignIn> {
       if (_formKey.currentState.validate()) {
         setState(() => _loading = true);
         dynamic result =
-            await _auth.signInWithEmailAndPassword(_email, _password);
+            await AuthService.signInWithEmailAndPassword(_email, _password);
         //if the user is not null, then the stream in main an wrapper
         //will be updated and therefore home screen will be displayed
         if (result == null) {
@@ -109,10 +110,24 @@ class _SignInState extends State<SignIn> {
           });
         }
       }
-    } on FirebaseAuthException catch (e, st) {
-      AlertDialog(
-          title: Text("Error"), content: Text(e.toString() + st.toString()));
-      //return createErrorWidget(e, st);
+    } on Exception catch (e) {
+       String errMsg = e.toString();
+      if (e is FirebaseAuthException) {          
+        if (e.code == 'invalid-email') {
+          errMsg = 'email address is invalid, enter a valid email address';
+        }
+        if (e.code == 'user-not-found') {
+          errMsg = 'User not found';
+        }
+        if (e.code == 'wrong-password') {
+          errMsg = 'Incorrect credentials';
+        }
+      }
+
+      setState(() {
+        _loading = false;
+        _error = errMsg;
+      });   
     }
   }
 }

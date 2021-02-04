@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ufr/screens/authenticate/register.dart';
 import 'package:ufr/screens/authenticate/sign_in.dart';
-import 'package:ufr/shared/modules.dart';
 
 class Authenticate extends StatefulWidget {
   @override
@@ -15,17 +14,11 @@ class _AuthenticateState extends State<Authenticate> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    try {
+  Widget build(BuildContext context) {    
       if (showSignIn) {
         return SignIn(toggleView: toggleView);
       } else {
         return Register(toggleView: toggleView);
       }
-    } on Exception catch (e, st) {
-      AlertDialog(
-          title: Text("Error"), content: Text(e.toString() + st.toString()));
-      return createErrorWidget(e, st);
-    }
   }
 }

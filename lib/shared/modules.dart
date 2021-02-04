@@ -3,38 +3,20 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:ufr/screens/home/report_form.dart';
-import 'package:ufr/shared/constants.dart';
-
-void showReportPanel({BuildContext context, String reportId}) {
-  showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return Container(          
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal:10.0),
-          child: ReportForm(reportId :reportId),
-        );
-      });
-}
 
 const textInputDecoration = InputDecoration(
   fillColor: Colors.white,
   filled: true,
-  contentPadding: EdgeInsets.all(12.0),                        
+  contentPadding: EdgeInsets.all(12.0),
   enabledBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.grey, width: 2.0),
-    borderRadius: BorderRadius.all(Radius.circular(2.0))    
-  ),
+      borderSide: BorderSide(color: Colors.grey, width: 2.0),
+      borderRadius: BorderRadius.all(Radius.circular(2.0))),
   focusedBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.pink, width: 2.0),
-    borderRadius: BorderRadius.all(Radius.circular(2.0))    
-  ),
+      borderSide: BorderSide(color: Colors.pink, width: 2.0),
+      borderRadius: BorderRadius.all(Radius.circular(2.0))),
 );
 
 String validateEmail(String value) {
-  try {
     if (value == null) {
       return 'Please enter mail';
     }
@@ -50,9 +32,6 @@ String validateEmail(String value) {
       return 'Enter Valid Email';
     else
       return null;
-  } on Exception catch (e) {
-    throw e;
-  }
 }
 
 Widget createErrorWidget(dynamic exception, StackTrace stackTrace) {
@@ -72,20 +51,20 @@ showADialog(BuildContext context, String content) {
       builder: (_) {
         if (Platform.isAndroid) {
           return new AlertDialog(
-            title: new Text("Ministry of Water and Irregation, USAID 2021"),
+            title: new Text("Utility Reporting Tool"),
             content: new Text(content) ?? '',
             actions: <Widget>[
               FlatButton(
                 child: Text('Close'),
                 onPressed: () {
-                  Navigator.pop(context);                
+                  Navigator.pop(context);
                 },
               )
             ],
           );
         } else if (Platform.isIOS) {
           return new CupertinoAlertDialog(
-            title: new Text("Ministry of Water and Irregation, USAID 2021"),
+            title: new Text("Utility Reporting Tool"),
             content: new Text(content ?? ''),
             actions: <Widget>[
               FlatButton(
@@ -100,6 +79,7 @@ showADialog(BuildContext context, String content) {
         throw '';
       });
 }
+
 class ReportsViewTypeChangeNotifier extends ChangeNotifier {
   ReportsViewTypeEnum reportViewType;
   void changeView(ReportsViewTypeEnum reportViewType) {
@@ -107,3 +87,23 @@ class ReportsViewTypeChangeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+enum ReportsViewTypeEnum { 
+   ViewAsTiles, 
+   ViewAsRows, 
+   ViewInMap,    
+}
+
+enum CrudOperationTypeEnum { 
+   Create, 
+   Update}
+
+showSnackBarMessage(String message)
+{
+  ScaffoldMessenger.of(scaffoldKey.currentContext).showSnackBar(SnackBar(
+                                  content: Text(message),
+                                  duration: Duration(milliseconds: 1500),
+                                ));    
+}
+
+final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();

@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 class Report {
-  final String rid;
-  final String userId;
-  final int utilityId;
-  final Timestamp time;
-  final String address;
-  final GeoPoint locationGeoPoint;
-  final String material;
-  final int diameter;
-  final String cause;
+  String rid;
+  String userId;
+  int utilityId;
+  Timestamp time;
+  String address;
+  GeoPoint locationGeoPoint;
+  String material;
+  int diameter;
+  String cause;
 
   Report(
       {this.rid,

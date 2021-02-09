@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ufr/screens/home/wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,8 +9,7 @@ import 'package:ufr/services/firebase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  
+  await Firebase.initializeApp();  
 
   // FlutterError.onError = (FlutterErrorDetails details) {
   //   //this line prints the default flutter gesture caught exception in console
@@ -20,36 +21,38 @@ void main() async {
   // };
 
   //Displayed instead of red screen
-  // ErrorWidget.builder = (FlutterErrorDetails details) {
-  //   return Material(
-  //     child: Padding(
-  //       padding: const EdgeInsets.only(top: 50),
-  //       child: Scaffold(
-  //         appBar: AppBar(
-  //           title: Text(''),
-  //         ),
-  //         body: SafeArea(
-  //           child: Text(
-  //             'Something went wrong, please try again or inform support if the problem persists!',
-  //             style: TextStyle(fontSize: 20, color: Colors.grey),
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // };
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Material(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 50),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(''),
+          ),
+          body: SafeArea(
+            child: Text(
+              'Something went wrong, please try again or inform support if the problem persists!' +
+                  details.exception.toString(),
+              style: TextStyle(fontSize: 20, color: Colors.grey),
+            ),
+          ),
+        ),
+      ),
+    );
+  };  
 
-runApp(MyApp());
-  // runZonedGuarded(() {
-  //   runApp(MyApp());
-  // }, // starting point of app
-  //   (error, stackTrace) {
-  //   print("Error FROM OUT_SIDE FRAMEWORK ");
-  //   print("--------------------------------");
-  //   print("Error :  $error");
-  //   print("StackTrace :  $stackTrace");
-  // });
+//runApp(MyApp());
+  runZonedGuarded(() {
+    runApp(MyApp());
+  }, // starting point of app
+      (error, stackTrace) {
+    print("Error FROM OUT_SIDE FRAMEWORK ");
+    print("--------------------------------");
+    print("Error :  $error");
+    print("StackTrace :  $stackTrace");
+  });
 }
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -57,7 +60,7 @@ class MyApp extends StatelessWidget {
     return StreamProvider<User>.value(
       value: AuthService.user,
       catchError: (context, e) {
-        print('****** : ' + e.toString());
+        print('*#*#*#*#*#* : ' + e.toString());
         return null;
       },
       child: MaterialApp(

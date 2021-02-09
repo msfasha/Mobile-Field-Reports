@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -20,6 +19,20 @@ class _HomeDrawerState extends State<HomeDrawer> {
   void initState() {
     _exportTitle = Text('Export to CSV');
     super.initState();
+  }
+
+  _logout() async {
+    try {
+      await AuthService.signOut();
+    } on Exception catch (e) {
+      
+    }
+  }
+
+  _exitApplication() async {
+    try {
+      SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+    } on Exception catch (e) {}
   }
 
   @override
@@ -54,9 +67,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   size: 20.0,
                 );
               });
-              
+
               ExportFromFireStore.exportToCSV(user.utilityId, context);
-              
+
               Navigator.pop(context);
             },
           ),
@@ -70,24 +83,11 @@ class _HomeDrawerState extends State<HomeDrawer> {
           ListTile(
               leading: Icon(Icons.person),
               title: Text('Logout'),
-              onTap: () async {
-                await AuthService.signOut();
-              }),
+              onTap: _logout),
           ListTile(
             leading: Icon(Icons.power_settings_new),
             title: Text('Exit'),
-            onTap: () async {              
-                SystemNavigator.pop();
-                if (Platform.isAndroid) {
-                  await AuthService.signOut();
-                  Future.delayed(const Duration(milliseconds: 1000), () {
-                    exit(0);
-                  });
-                } else if (Platform.isIOS) {
-                  await AuthService.signOut();
-                  exit(0);
-                }           
-            },
+            onTap: _exitApplication,
           ),
         ],
       ),

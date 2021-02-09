@@ -1,6 +1,6 @@
 class User {  
   String userId;
-  int utilityId;
+  String utilityId;
   String utilityName;
   String personName;
   String email;

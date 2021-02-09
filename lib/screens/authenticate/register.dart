@@ -25,7 +25,7 @@ class _RegisterState extends State<Register> {
   String _email;
   String _password;
   String _personName;
-  int _utilityId;
+  String _utilityId;
 
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _RegisterState extends State<Register> {
               padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
               child: Form(
                 key: _formKey,
-                child: Column(
+                child: ListView(
                   children: <Widget>[
                     TextFormField(
                          decoration: InputDecoration(
@@ -123,14 +123,16 @@ class _RegisterState extends State<Register> {
                                   //isDense: true,
                                   onChanged: (value) {
                                     setState(() {
-                                      _utilityId = int.parse(value.toString());
+                                      //_utilityId = int.parse(value.toString());
+                                      _utilityId = value;
                                     });
                                   },
                                   items: snapshot.data.docs
                                       .map((document) => DropdownMenuItem(
                                           // value: document.data['utility_id'],
                                           // child: Text(document.data['plant_name']),
-                                          value: document['utility_id'],
+                                          value: document.id,
+                                          //value: document['utility_id'],
                                           child: Text(
                                               document['native_name'] ?? '')))
                                       .toList()),

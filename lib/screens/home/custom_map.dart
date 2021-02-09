@@ -4,32 +4,48 @@ import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:ufr/shared/modules.dart';
 //import 'package:location/location.dart';
 
 class CustomMap extends StatefulWidget {
   final GeoPoint selectedGeoPoint;
+  final PermissionStatus locationPermissionStatus;
 
-  CustomMap({this.selectedGeoPoint});
+  CustomMap({this.selectedGeoPoint, this.locationPermissionStatus});
 
   @override
-  State<CustomMap> createState() =>
-      CustomMapState(selectedGeoPoint: selectedGeoPoint);
+  State<CustomMap> createState() => CustomMapState(
+      selectedGeoPoint: selectedGeoPoint,
+      locationPermissionStatus: locationPermissionStatus);
 }
 
 class CustomMapState extends State<CustomMap> {
   GeoPoint selectedGeoPoint;
+  PermissionStatus locationPermissionStatus;
+  bool _myLocationButton;
+  bool _myLocation;
+
   //Location location = new Location();
   Set<Marker> _markers = HashSet<Marker>();
   Completer<GoogleMapController> _controller = Completer();
   CameraPosition _cameraPosition;
 
-  CustomMapState({this.selectedGeoPoint});
+  CustomMapState({this.selectedGeoPoint, this.locationPermissionStatus});
 
   @override
   void initState() {
+    
+    if (locationPermissionStatus == PermissionStatus.granted) {
+      _myLocationButton = true;
+      _myLocation = true;
+    } else {
+      _myLocationButton = false;
+      _myLocation = false;
+    }
+
     _setInitialCameraPosition();
-    _checkLocationPermission();
+    //_checkLocationPermission();
     super.initState();
   }
 
@@ -52,39 +68,39 @@ class CustomMapState extends State<CustomMap> {
     }
   }
 
-  void _checkLocationPermission() async {
-    // bool _serviceEnabled = await location.serviceEnabled();
-    // if (!_serviceEnabled) {
-    //   _serviceEnabled = await location.requestService();
-    //   if (!_serviceEnabled) {
-    //     return;
-    //   }
-    // }
-    // PermissionStatus _permissionGranted = await location.hasPermission();
-    // if (_permissionGranted == PermissionStatus.denied) {
-    //   _permissionGranted = await location.requestPermission();
-    //   if (_permissionGranted != PermissionStatus.granted) {
-    //     return;
-    //   }
-    // }
-    //LocationData _selectedLocation = await location.getLocation();
-  }
+  //void _checkLocationPermission() async {
+  // bool _serviceEnabled = await location.serviceEnabled();
+  // if (!_serviceEnabled) {
+  //   _serviceEnabled = await location.requestService();
+  //   if (!_serviceEnabled) {
+  //     return;
+  //   }
+  // }
+  // PermissionStatus _permissionGranted = await location.hasPermission();
+  // if (_permissionGranted == PermissionStatus.denied) {
+  //   _permissionGranted = await location.requestPermission();
+  //   if (_permissionGranted != PermissionStatus.granted) {
+  //     return;
+  //   }
+  // }
+  //LocationData _selectedLocation = await location.getLocation();
+  //}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: customMapScafoldKey,
         appBar: AppBar(
           title: Text('Select Location'),
           backgroundColor: Colors.blue[400],
           elevation: 0.0,
         ),
-        body: Builder(
-          builder: (context) => Stack(
+        body: Stack(
             children: <Widget>[
               GoogleMap(
                 mapType: MapType.normal,
-                myLocationButtonEnabled: true,
-                myLocationEnabled: true,
+                myLocationButtonEnabled: _myLocationButton,
+                myLocationEnabled: _myLocation,
                 initialCameraPosition: _cameraPosition,
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
@@ -110,7 +126,9 @@ class CustomMapState extends State<CustomMap> {
                             color: Colors.black54,
                             onPressed: () {
                               if (selectedGeoPoint == null) {
-                                showSnackBarMessage('No point selected');                                
+                                showSnackBarMessage(
+                                    'No point selected',
+                                    customMapScafoldKey);
                               } else
                                 Navigator.pop(context, selectedGeoPoint);
                             },
@@ -140,6 +158,6 @@ class CustomMapState extends State<CustomMap> {
                       ])),
             ],
           ),
-        ));
+        );
   }
 }

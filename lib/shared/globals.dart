@@ -1,5 +1,5 @@
 
-class Constants {
+class Globals {
   static const List<int> diameterList = [
     50,
     63,
@@ -63,7 +63,6 @@ class Constants {
     'Old Pipe',
     'Bad Installation'
   ];
+
 }
-
-
 

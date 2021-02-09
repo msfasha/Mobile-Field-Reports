@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 
 const textInputDecoration = InputDecoration(
   fillColor: Colors.white,
@@ -17,21 +17,38 @@ const textInputDecoration = InputDecoration(
 );
 
 String validateEmail(String value) {
-    if (value == null) {
-      return 'Please enter mail';
-    }
+  if (value == null) {
+    return 'Please enter mail';
+  }
 
-    if (value.isEmpty) {
-      return 'Please enter mail';
-    }
+  if (value.isEmpty) {
+    return 'Please enter mail';
+  }
 
-    Pattern pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = new RegExp(pattern.toString());
-    if (!regex.hasMatch(value))
-      return 'Enter Valid Email';
-    else
-      return null;
+  Pattern pattern =
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+  RegExp regex = new RegExp(pattern.toString());
+  if (!regex.hasMatch(value))
+    return 'Enter Valid Email';
+  else
+    return null;
+}
+
+dynamic downloadImage(String url) async {
+  try {
+    final Reference ref = FirebaseStorage.instance.ref().child(url);
+
+    final Directory systemTempDir = Directory.systemTemp;
+    final File tempFile = File('${systemTempDir.path}/temp-${ref.name}');
+    if (tempFile.existsSync()) await tempFile.delete();
+
+    await ref.writeToFile(tempFile);
+
+    return tempFile;
+  } on Exception catch (e) {
+    return e.toString();
+    //showSnackBarMessage(e.toString(), reportFormScaffoldKey);
+  }
 }
 
 Widget createErrorWidget(dynamic exception, StackTrace stackTrace) {
@@ -88,22 +105,37 @@ class ReportsViewTypeChangeNotifier extends ChangeNotifier {
   }
 }
 
-enum ReportsViewTypeEnum { 
-   ViewAsTiles, 
-   ViewAsRows, 
-   ViewInMap,    
+enum ReportsViewTypeEnum {
+  ViewAsTiles,
+  ViewAsRows,
+  ViewInMap,
 }
 
-enum CrudOperationTypeEnum { 
-   Create, 
-   Update}
+enum CrudOperationTypeEnum { Create, Update }
+enum ImageCapturingMethodEnum { Camera, PhotoLibrary }
 
-showSnackBarMessage(String message)
-{
-  ScaffoldMessenger.of(scaffoldKey.currentContext).showSnackBar(SnackBar(
-                                  content: Text(message),
-                                  duration: Duration(milliseconds: 1500),
-                                ));    
+showSnackBarMessage(String content, GlobalKey<ScaffoldState> scaffoldKey) {
+  try {
+    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(content)));
+  } on Exception catch (e) {
+    print('Error occured in ShowSnackBar: ${e.toString()}');
+  }
+
+  // Scaffold.of(context).showSnackBar(SnackBar(
+  //   content: Text(message),
+  //   duration: Duration(milliseconds: 1500),
+  // ));
+
+  // scaffoldKey.currentState.showSnackBar(SnackBar(
+  // content: Text(message)));
+
+  // ScaffoldMessenger.of(scaffoldKey.currentContext).showSnackBar(SnackBar(
+  //   content: Text(message),
+  //   duration: Duration(milliseconds: 1500),
+  // ));
 }
 
-final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+final GlobalKey<ScaffoldState> homeScaffoldKey = GlobalKey<ScaffoldState>();
+final GlobalKey<ScaffoldState> reportFormScaffoldKey =
+    GlobalKey<ScaffoldState>();
+final GlobalKey<ScaffoldState> customMapScafoldKey = GlobalKey<ScaffoldState>();

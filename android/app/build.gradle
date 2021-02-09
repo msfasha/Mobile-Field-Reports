@@ -33,6 +33,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+   
     compileSdkVersion 30
 
     sourceSets {
@@ -61,7 +62,9 @@ android {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.release;
+            shrinkResources false
+            minifyEnabled false        
+            signingConfig signingConfigs.release
         }
     }
 }

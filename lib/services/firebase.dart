@@ -3,11 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as authLib;
 import 'package:ufr/models/user.dart';
 
-class TestService
-{
-   //******************************************************** */
-    static Future<String> deleteRecord() {
-
+class TestService {
+  //******************************************************** */
+  static Future<String> deleteRecord() {
     return Future.delayed(Duration(milliseconds: 2000))
         .then((value) => ('then finished'));
 
@@ -17,6 +15,7 @@ class TestService
     //return ''; //.then((value) => 'Done from then');
     //return ('Done');
   }
+
   static String myMethod() {
     timedelay();
     return 'Done';
@@ -25,12 +24,13 @@ class TestService
     //return ('Done');
   }
 
-  static Future<String> timedelay()  {
+  static Future<String> timedelay() {
     return Future.delayed(Duration(milliseconds: 2000))
         .then((value) => ('second then finished'));
   }
   //********************************************************
 }
+
 class AuthService {
   static Future<User> _userFromFirebaseUser(authLib.User user) async {
     try {
@@ -45,7 +45,7 @@ class AuthService {
             utilityName: await DatabaseService.getUtilityByUtilityId(
                     userDoc.data()['utility_id'])
                 .then((value) {
-              return value.docs.first.data()['foreign_name'];
+              return value.data()['foreign_name'];
             }),
             personName: userDoc.data()['person_name'],
             email: user.email);
@@ -93,8 +93,8 @@ class AuthService {
   }
 
   // register with email and password
-  static Future registerWithEmailAndPassword(
-      String email, String password, int utilityId, String personName) async {
+  static Future registerWithEmailAndPassword(String email, String password,
+      String utilityId, String personName) async {
     try {
       authLib.UserCredential result = await authLib.FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -119,8 +119,6 @@ class AuthService {
 }
 
 class DatabaseService {
- 
-
   static Future<DocumentSnapshot> getUserProfile(String uid) {
     try {
       return FirebaseFirestore.instance
@@ -132,11 +130,11 @@ class DatabaseService {
     }
   }
 
-  static Future<QuerySnapshot> getUtilityByUtilityId(int utilityId) {
+  static Future<DocumentSnapshot> getUtilityByUtilityId(String utilityId) {
     try {
       return FirebaseFirestore.instance
           .collection('utility')
-          .where('utility_id', isEqualTo: utilityId)
+          .doc(utilityId)
           .get();
     } on Exception catch (e) {
       throw e;
@@ -144,7 +142,7 @@ class DatabaseService {
   }
 
   static Future<void> updateUserProfile(
-      String userId, int utilityId, String personName) {
+      String userId, String utilityId, String personName) {
     try {
       return FirebaseFirestore.instance
           .collection('user_profile')
@@ -165,6 +163,7 @@ class DatabaseService {
       'time': report.time,
       'address': report.address,
       'location_geopoint': report.locationGeoPoint,
+      'image_url': report.imageURL,
       'material': report.material,
       'diameter': report.diameter,
       'cause': report.cause
@@ -179,6 +178,7 @@ class DatabaseService {
       'time': report.time,
       'address': report.address,
       'location_geopoint': report.locationGeoPoint,
+      'image_url': report.imageURL,
       'material': report.material,
       'diameter': report.diameter,
       'cause': report.cause
@@ -198,7 +198,7 @@ class DatabaseService {
 
   // report list from snapshot
   static List<Report> _reportListFromSnapshot(QuerySnapshot snapshot) {
-    try {
+    try {      
       return snapshot.docs.map((doc) {
         return Report(
             rid: doc.id,
@@ -207,6 +207,7 @@ class DatabaseService {
             time: doc.data()['time'],
             address: doc.data()['address'],
             locationGeoPoint: doc.data()['location_geopoint'],
+            imageURL: doc.data()['image_url'],
             material: doc.data()['material'],
             diameter: doc.data()['diameter'],
             cause: doc.data()['cause']);
@@ -226,6 +227,7 @@ class DatabaseService {
           time: snapshot.data()['time'],
           address: snapshot.data()['address'],
           locationGeoPoint: snapshot.data()['location_geopoint'],
+          imageURL: snapshot.data()['image_url'],
           material: snapshot.data()['material'],
           diameter: snapshot.data()['diameter'],
           cause: snapshot.data()['cause']);
@@ -235,7 +237,7 @@ class DatabaseService {
   }
 
   // get reports stream
-  static Stream<List<Report>> getReportsStream(int utilityId) {
+  static Stream<List<Report>> getReportsStream(String utilityId) {
     try {
       return FirebaseFirestore.instance
           .collection('report')
@@ -248,7 +250,7 @@ class DatabaseService {
     }
   }
 
-  static Future<QuerySnapshot> getReportsSnapshot(int utilityId) {
+  static Future<QuerySnapshot> getReportsSnapshot(String utilityId) {
     try {
       return FirebaseFirestore.instance
           .collection('report')
@@ -275,10 +277,8 @@ class DatabaseService {
 
   static Future<QuerySnapshot> get utilities {
     try {
-      return FirebaseFirestore.instance
-          .collection('utility')
-          .get()
-          .then((value) => value);
+      return FirebaseFirestore.instance.collection('utility').get();
+      //.then((value) => value);
     } on Exception catch (e) {
       throw e;
     }

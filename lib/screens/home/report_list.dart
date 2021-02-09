@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:ufr/models/report.dart';
+import 'package:ufr/screens/home/display_image.dart';
 import 'package:ufr/screens/home/report_form.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,12 +27,20 @@ class _ReportsListState extends State<ReportsList> {
     super.initState();
   }
 
-  Widget _tileWidget(String timeTxt, String locationTxt, String reportId) {
+  Widget _tileWidget(
+      String timeTxt, String locationTxt, String reportId, String imageURL) {
     return Card(
       margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
       child: ListTile(
         selectedTileColor: Colors.blueGrey,
-        leading: Icon(Icons.photo_library),
+        leading: imageURL != null
+            ? IconButton(
+                icon: Icon(Icons.photo_library),
+                onPressed: () {
+                   Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayImage(url:imageURL)));
+                },
+              )
+            : null,
         // leading: CircleAvatar(
         //   radius: 25.0,
         //   backgroundColor: Colors.blue,
@@ -58,13 +67,13 @@ class _ReportsListState extends State<ReportsList> {
                 onPressed: () {
                   DatabaseService.getReport(reportId).then((value) {
                     Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ReportForm(report: value)))
-                        .catchError((e) {
-                        showSnackBarMessage('Error Occured: ${e.toString()}');
-                      });
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ReportForm(report: value))).catchError((e) {
+                      showSnackBarMessage(
+                          'Error Occured: ${e.toString()}', homeScaffoldKey);
+                    });
                   });
                 }),
             IconButton(
@@ -83,10 +92,10 @@ class _ReportsListState extends State<ReportsList> {
   Widget _rowWidget(String timeTxt, String locationTxt, String reportId) {
     return Column(
       children: [
-        Container(
-          height: 30,
-          child: Padding(
+        Padding(
             padding: const EdgeInsets.only(left: 10, right: 10),
+          child: Container(
+            height: 30,
             child: Row(children: [
               Expanded(
                 flex: 4,
@@ -130,8 +139,8 @@ class _ReportsListState extends State<ReportsList> {
                   icon: Icon(Icons.delete),
                   tooltip: 'Delete report',
                   onPressed: () {
-                    print (TestService.deleteRecord());
-                    //DatabaseService.deleteReport(reportId);
+                    //print(TestService.deleteRecord());
+                    DatabaseService.deleteReport(reportId);
                   },
                 ),
               ),
@@ -164,12 +173,12 @@ class _ReportsListState extends State<ReportsList> {
             shrinkWrap: true,
             itemBuilder: (context, index) {
               return _tileWidget(
-                DateFormat('yyyy-MM-dd – kk:mm')
-                        .format(reports[index].time.toDate()) ??
-                    '',
-                reports[index].address ?? '',
-                reports[index].rid,
-              );
+                  DateFormat('yyyy-MM-dd – kk:mm')
+                          .format(reports[index].time.toDate()) ??
+                      '',
+                  reports[index].address ?? '',
+                  reports[index].rid,
+                  reports[index].imageURL);
             },
           );
         } else if (viewType.reportViewType == ReportsViewTypeEnum.ViewAsRows) {

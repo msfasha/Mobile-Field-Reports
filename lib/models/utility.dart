@@ -1,5 +1,5 @@
 class Utility {
-  int utilityId;
+  String utilityId;
   String nativeName;
   String foreignName;
 

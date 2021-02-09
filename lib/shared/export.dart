@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,19 +11,16 @@ import 'package:ufr/services/firebase.dart';
 import 'package:ufr/shared/modules.dart';
 
 class ExportFromFireStore {
-  static exportToCSV(int utilityId, BuildContext context) async {
+  static exportToCSV(String utilityId, BuildContext context) async {
     try {
       var status = await Permission.storage.status;
-
-      print(status);
 
       if (status != PermissionStatus.granted) {
         status = await Permission.storage.request();
 
-        status = await Permission.storage.request();
-
         if (status != PermissionStatus.granted) {
-          showSnackBarMessage('No permission to write to disk');
+          showSnackBarMessage(
+              'No permission to write to disk', homeScaffoldKey);
           return;
         }
       }
@@ -35,16 +33,14 @@ class ExportFromFireStore {
           '.csv';
 
       File file = new File(fileFullPath);
-      IOSink sink = file.openWrite();
+      //IOSink sink = file.openWrite(encoding: Encoding.getByName('utf8'));
+      //IOSink sink = file.openWrite(encoding: Encoding.getByName('utf8'));
+      //IOSink sink = file.openWrite(encoding: Encoding.getByName('utf8'));
 
       QuerySnapshot querySnapshot =
           await DatabaseService.getReportsSnapshot(utilityId);
 
-      String row = 'id' +
-          ',' +
-          'uesr_id' +
-          ',' +
-          'utility_id' +
+      String row = 'utility_id' +
           ',' +
           'time' +
           ',' +
@@ -56,52 +52,57 @@ class ExportFromFireStore {
           ',' +
           'material' +
           ',' +
-          'cause\n';
+          'cause' +
+          '\n';
 
-      sink.write(row);
+      //sink.writeln(row);
 
-      if (querySnapshot.size != 0) {
-        querySnapshot.docs.forEach((element) {
-          row = element.id + ',' + element.data()['user_id'] != null
-              ? element.data()['user_id'].toString()
-              : '' + ',' + element.data()['utility_id'] != null
-                  ? element.data()['utility_id'].toString()
-                  : '' + ',' + element.data()['time'] != null
-                      ? (element.data()['time'] as Timestamp)
-                          .toDate()
-                          .toString()
-                      : '' + ',' + element.data()['address'] != null
-                          ? element.data()['address']
-                          : '' + ',' + element.data()['location_geopoint'] !=
-                                  null
-                              ? (element.data()['location_geopoint']
-                                          as GeoPoint)
-                                      .latitude
-                                      .toString() +
-                                  '-' +
-                                  (element.data()['location_geopoint']
-                                          as GeoPoint)
-                                      .longitude
-                                      .toString()
-                              : '' + ',' + element.data()['diameter'] != null
-                                  ? element.data()['diameter'].toString()
-                                  : '' + ',' + element.data()['material'] !=
-                                          null
-                                      ? element.data()['material']
-                                      : '' + ',' + element.data()['cause'] !=
-                                              null
-                                          ? element.data()['cause']
-                                          : '' + '\n';
+      querySnapshot.docs.forEach((element) async {
+        row = row +
+            (element.data()['utility_id'] != null
+                ? element.data()['utility_id'].toString()
+                : '') +
+            ',' +
+            (element.data()['time'] != null
+                ? (element.data()['time'] as Timestamp).toDate().toString()
+                : '') +
+            ',' +
+            (element.data()['address'] != null
+                ? element.data()['address']
+                : '') +
+            ',' +
+            (element.data()['location_geopoint'] != null
+                ? (element.data()['location_geopoint'] as GeoPoint)
+                        .latitude
+                        .toString() +
+                    '-' +
+                    (element.data()['location_geopoint'] as GeoPoint)
+                        .longitude
+                        .toString()
+                : '') +
+            ',' +
+            (element.data()['diameter'] != null
+                ? element.data()['diameter'].toString()
+                : '') +
+            ',' +
+            (element.data()['material'] != null
+                ? element.data()['material']
+                : '') +
+            ',' +
+            (element.data()['cause'] != null
+                ? element.data()['cause']
+                : '' ) + '\n';
 
-          sink.write(row);
-        });
-      }
+        //sink.writeln(row);
+      });      
+      //await file.writeAsBytes(utf8.encode(row), flush: true);
+      await file.writeAsString(row, encoding: utf8, flush: true);
       //sink.flush();
-      sink.close();
+      //sink.close();
 
-      showSnackBarMessage('File saved in $downloadDir');
+      showSnackBarMessage('File saved in $downloadDir', homeScaffoldKey);
     } on Exception catch (e) {
-      showSnackBarMessage('Error occured: ${e.toString()}');
+      showSnackBarMessage('Error occured: ${e.toString()}', homeScaffoldKey);
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:ufr/models/report.dart';
+import 'package:ufr/models/user.dart';
 import 'package:ufr/screens/home/display_image.dart';
 import 'package:ufr/screens/home/report_form.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,10 @@ class _ReportsListState extends State<ReportsList> {
             ? IconButton(
                 icon: Icon(Icons.photo_library),
                 onPressed: () {
-                   Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayImage(url:imageURL)));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DisplayImage(url: imageURL)));
                 },
               )
             : null,
@@ -93,7 +97,7 @@ class _ReportsListState extends State<ReportsList> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10),
+          padding: const EdgeInsets.only(left: 10, right: 10),
           child: Container(
             height: 30,
             child: Row(children: [
@@ -160,6 +164,8 @@ class _ReportsListState extends State<ReportsList> {
   @override
   Widget build(BuildContext context) {
     final reports = Provider.of<List<Report>>(context);
+    final user = Provider.of<User>(context);
+    
     if (reports == null) return Text('');
 
     return Expanded(

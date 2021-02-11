@@ -81,7 +81,7 @@ showADialog(BuildContext context, String content) {
           );
         } else if (Platform.isIOS) {
           return new CupertinoAlertDialog(
-            title: new Text("Utility Reporting Tool"),
+            title: new Text("Utitity Reporting Tool"),
             content: new Text(content ?? ''),
             actions: <Widget>[
               FlatButton(
@@ -139,3 +139,4 @@ final GlobalKey<ScaffoldState> homeScaffoldKey = GlobalKey<ScaffoldState>();
 final GlobalKey<ScaffoldState> reportFormScaffoldKey =
     GlobalKey<ScaffoldState>();
 final GlobalKey<ScaffoldState> customMapScafoldKey = GlobalKey<ScaffoldState>();
+final GlobalKey<ScaffoldState> registerScafoldKey = GlobalKey<ScaffoldState>();

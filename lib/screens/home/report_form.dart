@@ -6,10 +6,10 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ufr/models/report.dart';
-import 'package:ufr/models/user.dart';
+import 'package:ufr/models/user_profile.dart';
 import 'package:ufr/screens/home/custom_map.dart';
 import 'package:provider/provider.dart';
-import 'package:ufr/services/firebase.dart';
+import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/globals.dart';
 import 'package:ufr/shared/modules.dart';
 
@@ -99,15 +99,14 @@ class _ReportFormState extends State<ReportForm> {
 
   _saveReport(GlobalKey<FormState> _key) async {
     if (_key.currentState.validate()) {
-      final user = Provider.of<User>(context, listen: false);
+      final user = Provider.of<UserProfile>(context, listen: false);
 
       String storagePath;
-      if (_capturedFile != null)
-        storagePath = await _uploadImage(user.utilityId);
+      if (_capturedFile != null) storagePath = await _uploadImage();
 
       Report report = Report(
           userId: user.userId,
-          utilityId: user.utilityId,
+          organizationId: user.organizationId,
           time: _reportTimeStamp,
           address: _reportAddress,
           locationGeoPoint: _reportLocationGeoPoint,
@@ -117,13 +116,13 @@ class _ReportFormState extends State<ReportForm> {
           cause: _reportCause);
 
       if (_crudOperationType == CrudOperationTypeEnum.Create) {
-        DatabaseService.createReport(report).then((value) {}).catchError((e) {
+        DataService.createReport(report).then((value) {}).catchError((e) {
           showSnackBarMessage(
               'Error Occured: ${e.toString()}', reportFormScaffoldKey);
         });
       } else {
         report.rid = _report.rid;
-        DatabaseService.updateReport(report).then((value) {}).catchError((e) {
+        DataService.updateReport(report).then((value) {}).catchError((e) {
           showSnackBarMessage(
               'Error Occured: ${e.toString()}', reportFormScaffoldKey);
         });
@@ -169,11 +168,11 @@ class _ReportFormState extends State<ReportForm> {
     }
   }
 
-  Future<String> _uploadImage(String utilityId) async {
+  Future<String> _uploadImage() async {
     try {
       Reference ref = FirebaseStorage.instance
           .ref()
-          .child('ufr/$utilityId/')
+          .child('ufr/')
           .child('${_capturedFile.path.split('/').last}');
 
       final metadata = SettableMetadata(
@@ -189,17 +188,23 @@ class _ReportFormState extends State<ReportForm> {
     }
   }
 
-  _toggleCameraGallerySelection(
-      ImageCapturingMethodEnum imageCapturingMethod, String utilityId) async {
+  _toggleCameraGallerySelection(ImageCapturingMethodEnum imageCapturingMethod,
+      String organizationId) async {
     try {
       var capturedFile;
 
       if (imageCapturingMethod == ImageCapturingMethodEnum.Camera) {
-        capturedFile = await ImagePicker()
-            .getImage(source: ImageSource.camera, imageQuality: 50);
+        capturedFile = await ImagePicker().getImage(
+            source: ImageSource.camera,
+            imageQuality: 50,
+            maxHeight: 480,
+            maxWidth: 640);
       } else
-        capturedFile = await ImagePicker()
-            .getImage(source: ImageSource.gallery, imageQuality: 50);
+        capturedFile = await ImagePicker().getImage(
+            source: ImageSource.gallery,
+            imageQuality: 50,
+            maxHeight: 480,
+            maxWidth: 640);
 
       if (capturedFile != null) {
         setState(() {
@@ -217,11 +222,11 @@ class _ReportFormState extends State<ReportForm> {
       _imageStatus = imageStatusEnum.NoImage;
       _capturedFile = null;
     });
-  }  
+  }
 
   void _selectImage() async {
     try {
-      final user = Provider.of<User>(context, listen: false);
+      final user = Provider.of<UserProfile>(context, listen: false);
 
       showModalBottomSheet(
           context: context,
@@ -234,7 +239,7 @@ class _ReportFormState extends State<ReportForm> {
                     title: Text("Camera photo"),
                     onTap: () {
                       _toggleCameraGallerySelection(
-                          ImageCapturingMethodEnum.Camera, user.utilityId);
+                          ImageCapturingMethodEnum.Camera, user.organizationId);
                       Navigator.pop(context);
                     },
                   ),
@@ -244,7 +249,7 @@ class _ReportFormState extends State<ReportForm> {
                     onTap: () {
                       _toggleCameraGallerySelection(
                           ImageCapturingMethodEnum.PhotoLibrary,
-                          user.utilityId);
+                          user.organizationId);
                       Navigator.pop(context);
                     },
                   )
@@ -398,29 +403,35 @@ class _ReportFormState extends State<ReportForm> {
                   Text(_imageStatus == imageStatusEnum.NoImage
                       ? 'Capture an image for the site'
                       : 'Image selected'),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _imageStatus != imageStatusEnum.NoImage
-                          ? IconButton(
-                              icon: Icon(Icons.cancel),
-                              onPressed: _cancelCapturedImage)
-                          : Container(),          
-                  _imageStatus != imageStatusEnum.NoImage
-                      ? IconButton(
-                          icon: Icon(Icons.image),
-                          onPressed: _capturedFile != null
-                              ? () => Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayImage(file : File(_capturedFile.path))))                             
-                              : () => Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayImage(url : _reportImageURL)))                             
-                        )
-                      : Container(),
-                  IconButton(
-                      icon: Icon(Icons.camera),
-                      onPressed: () {
-                        _unFocus();
-                        _selectImage();
-                      }),
-                ])],
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    _imageStatus != imageStatusEnum.NoImage
+                        ? IconButton(
+                            icon: Icon(Icons.cancel),
+                            onPressed: _cancelCapturedImage)
+                        : Container(),
+                    _imageStatus != imageStatusEnum.NoImage
+                        ? IconButton(
+                            icon: Icon(Icons.image),
+                            onPressed: _capturedFile != null
+                                ? () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => DisplayImage(
+                                            file: File(_capturedFile.path))))
+                                : () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => DisplayImage(
+                                            url: _reportImageURL))))
+                        : Container(),
+                    IconButton(
+                        icon: Icon(Icons.camera),
+                        onPressed: () {
+                          _unFocus();
+                          _selectImage();
+                        }),
+                  ])
+                ],
               ),
               SizedBox(height: 10.0),
               Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [

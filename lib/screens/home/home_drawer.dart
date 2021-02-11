@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:ufr/models/user.dart';
-import 'package:ufr/services/firebase.dart';
+import 'package:ufr/models/user_profile.dart';
+import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/export.dart';
 import 'package:ufr/shared/modules.dart';
 import 'package:provider/provider.dart';
@@ -25,19 +25,22 @@ class _HomeDrawerState extends State<HomeDrawer> {
     try {
       await AuthService.signOut();
     } on Exception catch (e) {
-      
+      //TODO need to remove print to something else
+      print(e.toString());
     }
   }
 
   _exitApplication() async {
     try {
       SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-    } on Exception catch (e) {}
+    } on Exception catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
+    final user = Provider.of<UserProfile>(context);
 
     return Drawer(
       child: ListView(
@@ -68,7 +71,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 );
               });
 
-              ExportFromFireStore.exportToCSV(user.utilityId, context);
+              ExportFromFireStore.exportToCSV(user.organizationId, context);
 
               Navigator.pop(context);
             },

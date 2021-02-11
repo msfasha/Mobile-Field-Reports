@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Report {
   String rid;
   String userId;
-  String utilityId;
+  String organizationId;
   Timestamp time;
   String address;
   GeoPoint locationGeoPoint;
@@ -15,7 +15,7 @@ class Report {
   Report(
       {this.rid,
       this.userId,
-      this.utilityId,
+      this.organizationId,
       this.time,
       this.address,
       this.locationGeoPoint,

@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:ufr/services/firebase.dart';
+import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/modules.dart';
 
 class ExportFromFireStore {
-  static exportToCSV(String utilityId, BuildContext context) async {
+  static exportToCSV(String organizationId, BuildContext context) async {
     try {
       var status = await Permission.storage.status;
 
@@ -38,9 +38,9 @@ class ExportFromFireStore {
       //IOSink sink = file.openWrite(encoding: Encoding.getByName('utf8'));
 
       QuerySnapshot querySnapshot =
-          await DatabaseService.getReportsSnapshot(utilityId);
+          await DataService.getReportsSnapshot(organizationId);
 
-      String row = 'utility_id' +
+      String row = 'organization_id' +
           ',' +
           'time' +
           ',' +
@@ -59,8 +59,8 @@ class ExportFromFireStore {
 
       querySnapshot.docs.forEach((element) async {
         row = row +
-            (element.data()['utility_id'] != null
-                ? element.data()['utility_id'].toString()
+            (element.data()['organization_id'] != null
+                ? element.data()['organization_id'].toString()
                 : '') +
             ',' +
             (element.data()['time'] != null
@@ -89,12 +89,11 @@ class ExportFromFireStore {
                 ? element.data()['material']
                 : '') +
             ',' +
-            (element.data()['cause'] != null
-                ? element.data()['cause']
-                : '' ) + '\n';
+            (element.data()['cause'] != null ? element.data()['cause'] : '') +
+            '\n';
 
         //sink.writeln(row);
-      });      
+      });
       //await file.writeAsBytes(utf8.encode(row), flush: true);
       await file.writeAsString(row, encoding: utf8, flush: true);
       //sink.flush();

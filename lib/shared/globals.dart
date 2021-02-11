@@ -1,4 +1,3 @@
-
 class Globals {
   static const List<int> diameterList = [
     50,
@@ -63,6 +62,4 @@ class Globals {
     'Old Pipe',
     'Bad Installation'
   ];
-
 }
-

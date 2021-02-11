@@ -1,11 +1,10 @@
 import 'package:intl/intl.dart';
 import 'package:ufr/models/report.dart';
-import 'package:ufr/models/user.dart';
 import 'package:ufr/screens/home/display_image.dart';
 import 'package:ufr/screens/home/report_form.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ufr/services/firebase.dart';
+import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/modules.dart';
 
 typedef Widget ListingItemCreator(String s1, String s2, String s3);
@@ -69,7 +68,7 @@ class _ReportsListState extends State<ReportsList> {
                 icon: Icon(Icons.edit),
                 tooltip: 'Edit report information',
                 onPressed: () {
-                  DatabaseService.getReport(reportId).then((value) {
+                  DataService.getReport(reportId).then((value) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -84,7 +83,7 @@ class _ReportsListState extends State<ReportsList> {
               icon: Icon(Icons.delete),
               tooltip: 'Delete report',
               onPressed: () {
-                DatabaseService.deleteReport(reportId);
+                DataService.deleteReport(reportId);
               },
             ),
           ],
@@ -127,7 +126,7 @@ class _ReportsListState extends State<ReportsList> {
                     onPressed: () async {
                       try {
                         Report result =
-                            await DatabaseService.getReport(reportId);
+                            await DataService.getReport(reportId);
 
                         Navigator.push(
                             context,
@@ -144,7 +143,7 @@ class _ReportsListState extends State<ReportsList> {
                   tooltip: 'Delete report',
                   onPressed: () {
                     //print(TestService.deleteRecord());
-                    DatabaseService.deleteReport(reportId);
+                    DataService.deleteReport(reportId);
                   },
                 ),
               ),
@@ -164,8 +163,7 @@ class _ReportsListState extends State<ReportsList> {
   @override
   Widget build(BuildContext context) {
     final reports = Provider.of<List<Report>>(context);
-    final user = Provider.of<User>(context);
-    
+
     if (reports == null) return Text('');
 
     return Expanded(

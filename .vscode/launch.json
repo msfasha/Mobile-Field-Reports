@@ -21,7 +21,7 @@
             "name": "ufr debug",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "debug"
+            "flutterMode": "debug",    
         }
     ]
 }

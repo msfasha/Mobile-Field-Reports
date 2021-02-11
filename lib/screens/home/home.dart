@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ufr/models/user_profile.dart';
 import 'package:ufr/screens/home/home_drawer.dart';
 import 'package:provider/provider.dart';
 
-import 'package:ufr/models/user.dart';
 import 'package:ufr/models/report.dart';
 import 'package:ufr/screens/home/report_list.dart';
-import 'package:ufr/services/firebase.dart';
+import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/modules.dart';
 
 import 'report_form.dart';
@@ -24,15 +24,14 @@ class _HomeState extends State<Home> {
     _changeNotifier = ReportsViewTypeChangeNotifier();
     _changeNotifier.changeView(ReportsViewTypeEnum.ViewAsTiles);
     super.initState();
-
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
+    final user = Provider.of<UserProfile>(context);
 
     return StreamProvider<List<Report>>.value(
-      value: DatabaseService.getReportsStream(user.utilityId),
+      value: DataService.getReportsStream(user.organizationId),
       catchError: (context, e) {
         return [];
       },
@@ -47,7 +46,7 @@ class _HomeState extends State<Home> {
             },
             tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
           ),
-          title: Text(user.utilityName),
+          title: Text(user.organizationName),
           backgroundColor: Colors.blue[400],
           elevation: 0.0,
           actions: <Widget>[

@@ -1,16 +1,37 @@
 TODO
+Essential:
+----------
+change utility to organization.
+add phone number to user profile.
+Modify permissions to allow CRUD or not.
+Add time limit to scrolling, or a mechanism for long scrolls.
+investiagte login using username and password rather than email.
+Fix image size during capture and save.
+Delete old image when a new image is updated or report is deleted.
+Delete old image when a is deleted.
+Correct unicode in export.
+Publish to google play.
+Add download image functionality.
+Add loading to save button.
+add delete confirmation before deleting report.
+add to user profile:
+  - String creationDate;
+  - bool activated;
+  - DateTime activationStatusDate;
+  - String activationBy;
+Checkup todos
+
+Additional Enhancements:
+------------------------
 Needs a splash screen.
 Add nav controller.
-Modify permissions to allow CRUD/
-Add time limit to scrolling.
-Correct unicode in export.
-Fix image size duing capture and save.
 Localization.
 Revise document ids vs auto ids.
-Delete old image when a new image is updated.
 Resolve release configuration and size issue.
-Publish to google play.
 Revise error handling and reporting.
+Add map display functionality.
+
+Some restriction was mentioned about image picker and Android 29+, need something in application/manifest.xml
 
 
 Resolved issues.

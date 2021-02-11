@@ -1,24 +1,22 @@
 import 'dart:async';
 
-import 'package:ufr/screens/home/wrapper.dart';
+import 'package:ufr/screens/authenticate/wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ufr/models/user.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:ufr/services/firebase.dart';
+import 'package:ufr/shared/firebase_services.dart';
+import 'models/user_profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();  
+  await Firebase.initializeApp();
 
-  // FlutterError.onError = (FlutterErrorDetails details) {
-  //   //this line prints the default flutter gesture caught exception in console
-  //   FlutterError.dumpErrorToConsole(details);
-  //   print("Error From INSIDE FRAME_WORK");
-  //   print("----------------------");
-  //   print("Error :  ${details.exception}");
-  //   print("StackTrace :  ${details.stack}");
-  // };
+  FlutterError.onError = (FlutterErrorDetails details) {
+    //this line prints the default flutter gesture caught exception in console
+    FlutterError.dumpErrorToConsole(details);
+    print(
+        "Error From INSIDE FRAME_WORK :  ${details.exception} ${details.stack}");
+  };
 
   //Displayed instead of red screen
   ErrorWidget.builder = (FlutterErrorDetails details) {
@@ -39,17 +37,14 @@ void main() async {
         ),
       ),
     );
-  };  
+  };
 
 //runApp(MyApp());
   runZonedGuarded(() {
     runApp(MyApp());
   }, // starting point of app
       (error, stackTrace) {
-    print("Error FROM OUT_SIDE FRAMEWORK ");
-    print("--------------------------------");
-    print("Error :  $error");
-    print("StackTrace :  $stackTrace");
+    print("Error FROM OUT_SIDE FRAMEWORK :  $error $stackTrace");
   });
 }
 
@@ -57,7 +52,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<User>.value(
+    return StreamProvider<UserProfile>.value(
       value: AuthService.user,
       catchError: (context, e) {
         print('*#*#*#*#*#* : ' + e.toString());

@@ -59,6 +59,8 @@ class _RegisterState extends State<Register> {
                     'Sign In',
                     style: TextStyle(color: Colors.white),
                   ),
+                  //register widget is opened out of wrapper, meaning that wrapper won't get any notifications
+                  //about the registration process, therefore when we click on sign in link, we reactivate the wrapper widget
                   onPressed: () => Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => Wrapper())),
                 ),

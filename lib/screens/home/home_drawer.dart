@@ -76,6 +76,15 @@ class _HomeDrawerState extends State<HomeDrawer> {
               Navigator.pop(context);
             },
           ),
+          (user.userCategory == UserCategoryBaseEnum.SysAdmin.value)
+              ? ListTile(
+                  leading: Icon(Icons.admin_panel_settings),
+                  title: Text('Manage users'),
+                  onTap: () {
+                    showADialog(context, "Users management console");
+                  },
+                )
+              : Container(),
           ListTile(
             leading: Icon(Icons.info),
             title: Text('About'),

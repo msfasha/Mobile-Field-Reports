@@ -114,6 +114,21 @@ enum ReportsViewTypeEnum {
 enum CrudOperationTypeEnum { Create, Update }
 enum ImageCapturingMethodEnum { Camera, PhotoLibrary }
 
+enum UserCategoryBaseEnum { SysAdmin, User }
+
+extension UserCategoryEnum on UserCategoryBaseEnum {
+  String get value {
+    switch (this) {
+      case UserCategoryBaseEnum.SysAdmin:
+        return 'SysAdmin';
+      case UserCategoryBaseEnum.User:
+        return 'User';
+      default:
+        return null;
+    }
+  }
+}
+
 showSnackBarMessage(String content, GlobalKey<ScaffoldState> scaffoldKey) {
   try {
     scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(content)));

@@ -7,13 +7,13 @@ import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ufr/models/report.dart';
 import 'package:ufr/models/user_profile.dart';
-import 'package:ufr/screens/home/custom_map.dart';
 import 'package:provider/provider.dart';
 import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/globals.dart';
 import 'package:ufr/shared/modules.dart';
 
 import 'display_image.dart';
+import 'map_entry.dart';
 
 enum imageStatusEnum {
   NoImage,
@@ -151,7 +151,7 @@ class _ReportFormState extends State<ReportForm> {
       final GeoPoint result = await Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => CustomMap(
+            builder: (context) => EntryMap(
                 selectedGeoPoint: _reportLocationGeoPoint,
                 locationPermissionStatus: locationPermissionStatus)),
       );

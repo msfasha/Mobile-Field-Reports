@@ -3,23 +3,26 @@ Essential:
 ----------
 change utility to organization.
 add phone number to user profile.
-Modify permissions to allow CRUD or not.
-Add time limit to scrolling, or a mechanism for long scrolls.
 investiagte login using username and password rather than email.
+Add loading effect to save button.
+- String creationDate;
+  - bool activated;
+  - DateTime activationStatusDate;
+  - String activationBy;
+
+Modify permissions to allow CRUD or not.
+Add time limit to scrolling, or a mechanism for long scrolls, pagination.
 Fix image size during capture and save.
 Delete old image when a new image is updated or report is deleted.
 Delete old image when a is deleted.
 Correct unicode in export.
 Publish to google play.
 Add download image functionality.
-Add loading to save button.
 add delete confirmation before deleting report.
-add to user profile:
-  - String creationDate;
-  - bool activated;
-  - DateTime activationStatusDate;
-  - String activationBy;
-Checkup todos
+add to user profile:  
+admin functionalities, perissiom system.
+Checkup todos.
+
 
 Additional Enhancements:
 ------------------------
@@ -30,6 +33,12 @@ Revise document ids vs auto ids.
 Resolve release configuration and size issue.
 Revise error handling and reporting.
 Add map display functionality.
+Image zooming and sizing.
+Voice clips.
+fingerprint authentication.
+report auditing, create, update, delete, users and dates.
+Change storage folder to include /image and /voice, may be organization/agency subfolder.
+
 
 Some restriction was mentioned about image picker and Android 29+, need something in application/manifest.xml
 

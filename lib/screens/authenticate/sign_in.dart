@@ -7,8 +7,6 @@ import 'package:ufr/shared/loading.dart';
 import 'package:flutter/material.dart';
 
 class SignIn extends StatefulWidget {
-  SignIn();
-
   @override
   _SignInState createState() => _SignInState();
 }
@@ -35,9 +33,11 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserProfile>(context);
 
+    //This case happens when we sign in using a valid firebase user but the user is not activated by the sys admin
+    //We set the variables in here (in build method), yet they stick since the wrapper reopens the signin screen without chaning state
     if (user != null && user.userStatus == false) {
       _emailController.text = user.email;
-      _message = "User needs activation, call system support";
+      _message = "User not activated, call system support";
       _loading = false;
       AuthService.signOut();
     }
@@ -128,6 +128,8 @@ class _SignInState extends State<SignIn> {
       if (_formKey.currentState.validate()) {
         print('start');
         setState(() => _loading = true);
+
+        //After successfull login, this screen will be replaced by home screen by wrapper
         await AuthService.signInWithEmailAndPassword(_email, _password);
       }
     } on Exception catch (e) {

@@ -8,19 +8,19 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:ufr/shared/modules.dart';
 //import 'package:location/location.dart';
 
-class CustomMap extends StatefulWidget {
+class EntryMap extends StatefulWidget {
   final GeoPoint selectedGeoPoint;
   final PermissionStatus locationPermissionStatus;
 
-  CustomMap({this.selectedGeoPoint, this.locationPermissionStatus});
+  EntryMap({this.selectedGeoPoint, this.locationPermissionStatus});
 
   @override
-  State<CustomMap> createState() => CustomMapState(
+  State<EntryMap> createState() => EntryMapState(
       selectedGeoPoint: selectedGeoPoint,
       locationPermissionStatus: locationPermissionStatus);
 }
 
-class CustomMapState extends State<CustomMap> {
+class EntryMapState extends State<EntryMap> {
   GeoPoint selectedGeoPoint;
   PermissionStatus locationPermissionStatus;
   bool _myLocationButton;
@@ -31,7 +31,7 @@ class CustomMapState extends State<CustomMap> {
   Completer<GoogleMapController> _controller = Completer();
   CameraPosition _cameraPosition;
 
-  CustomMapState({this.selectedGeoPoint, this.locationPermissionStatus});
+  EntryMapState({this.selectedGeoPoint, this.locationPermissionStatus});
 
   @override
   void initState() {

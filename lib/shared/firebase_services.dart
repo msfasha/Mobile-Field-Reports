@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as authLib;
 import 'package:ufr/models/user_profile.dart';
 
+import 'modules.dart';
+
 class TestService {
   //******************************************************** */
   static Future<String> deleteRecord() {
@@ -110,8 +112,8 @@ class AuthService {
           .createUserWithEmailAndPassword(email: email, password: password);
 
       // create a new document for the user with the uid
-      DataService.updateUserProfile(
-          result.user.uid, organizationId, personName, phoneNumber);
+      DataService.updateUserProfile(result.user.uid, organizationId, personName,
+          phoneNumber, result.user.email);
 
       return getUserProfileFromFirebaseUser(result.user);
     } on Exception catch (e) {
@@ -154,7 +156,7 @@ class DataService {
   }
 
   static Future<void> updateUserProfile(String userId, String organizationId,
-      String personName, String phoneNumber) {
+      String personName, String phoneNumber, String email) {
     try {
       return FirebaseFirestore.instance
           .collection('user_profile')
@@ -163,7 +165,8 @@ class DataService {
         'organization_id': organizationId,
         'person_name': personName,
         'phone_number': phoneNumber,
-        'user_category': 'normal',
+        'email': email,
+        'user_category': UserCategoryBaseEnum.User.value,
         'creation_date': DateTime.now(),
         'user_status': false,
         'user_status_date': DateTime.now(),

@@ -4,6 +4,40 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+enum ReportsViewTypeEnum {
+  ViewAsTiles,
+  ViewAsRows,
+  ViewInMap,
+}
+
+enum CrudOperationTypeEnum { Create, Update }
+enum ImageCapturingMethodEnum { Camera, PhotoLibrary }
+
+enum UserCategoryBaseEnum { SysAdmin, User }
+
+extension UserCategoryEnum on UserCategoryBaseEnum {
+  String get value {
+    switch (this) {
+      case UserCategoryBaseEnum.SysAdmin:
+        return 'SysAdmin';
+      case UserCategoryBaseEnum.User:
+        return 'User';
+      default:
+        return null;
+    }
+  }
+}
+
+enum OperationResultCodeEnum { Success, Error }
+
+class OperationResult {
+  OperationResultCodeEnum operationCode;
+  String message;
+  dynamic content;
+
+  OperationResult({this.operationCode, this.message, this.content});
+}
+
 const textInputDecoration = InputDecoration(
   fillColor: Colors.white,
   filled: true,
@@ -34,7 +68,7 @@ String validateEmail(String value) {
     return null;
 }
 
-dynamic downloadImage(String url) async {
+dynamic downloadFile(String url) async {
   try {
     final Reference ref = FirebaseStorage.instance.ref().child(url);
 
@@ -46,10 +80,10 @@ dynamic downloadImage(String url) async {
 
     return tempFile;
   } on Exception catch (e) {
-    return e.toString();
-    //showSnackBarMessage(e.toString(), reportFormScaffoldKey);
+    throw e;
   }
 }
+
 
 Widget createErrorWidget(dynamic exception, StackTrace stackTrace) {
   final FlutterErrorDetails details = FlutterErrorDetails(
@@ -62,7 +96,7 @@ Widget createErrorWidget(dynamic exception, StackTrace stackTrace) {
   return ErrorWidget.builder(details);
 }
 
-showADialog(BuildContext context, String content) {
+showMessageDialog(BuildContext context, String content) {
   showDialog(
       context: context,
       builder: (_) {
@@ -97,35 +131,57 @@ showADialog(BuildContext context, String content) {
       });
 }
 
+showTwoButtonDialog(
+    BuildContext context,
+    String title,
+    String content,
+    String buttonOneTitle,
+    String buttonTwoTitle,
+    Function func1,
+    Function func2) {
+  showDialog(
+      context: context,
+      builder: (_) {
+        if (Platform.isAndroid) {
+          return AlertDialog(
+            title: new Text(title),
+            content: new Text(content) ?? '',
+            actions: <Widget>[
+              FlatButton(
+                child: Text(buttonOneTitle),
+                onPressed: func1,
+              ),
+              FlatButton(
+                child: Text(buttonTwoTitle),
+                onPressed: func2,
+              )
+            ],
+          );
+        } else if (Platform.isIOS) {
+          return CupertinoAlertDialog(
+            title: new Text(title),
+            content: new Text(content) ?? '',
+            actions: <Widget>[
+              FlatButton(
+                child: Text(buttonOneTitle),
+                onPressed: func1,
+              ),
+              FlatButton(
+                child: Text(buttonTwoTitle),
+                onPressed: func2,
+              )
+            ],
+          );
+        }
+        throw '';
+      });
+}
+
 class ReportsViewTypeChangeNotifier extends ChangeNotifier {
   ReportsViewTypeEnum reportViewType;
   void changeView(ReportsViewTypeEnum reportViewType) {
     this.reportViewType = reportViewType;
     notifyListeners();
-  }
-}
-
-enum ReportsViewTypeEnum {
-  ViewAsTiles,
-  ViewAsRows,
-  ViewInMap,
-}
-
-enum CrudOperationTypeEnum { Create, Update }
-enum ImageCapturingMethodEnum { Camera, PhotoLibrary }
-
-enum UserCategoryBaseEnum { SysAdmin, User }
-
-extension UserCategoryEnum on UserCategoryBaseEnum {
-  String get value {
-    switch (this) {
-      case UserCategoryBaseEnum.SysAdmin:
-        return 'SysAdmin';
-      case UserCategoryBaseEnum.User:
-        return 'User';
-      default:
-        return null;
-    }
   }
 }
 
@@ -135,19 +191,6 @@ showSnackBarMessage(String content, GlobalKey<ScaffoldState> scaffoldKey) {
   } on Exception catch (e) {
     print('Error occured in ShowSnackBar: ${e.toString()}');
   }
-
-  // Scaffold.of(context).showSnackBar(SnackBar(
-  //   content: Text(message),
-  //   duration: Duration(milliseconds: 1500),
-  // ));
-
-  // scaffoldKey.currentState.showSnackBar(SnackBar(
-  // content: Text(message)));
-
-  // ScaffoldMessenger.of(scaffoldKey.currentContext).showSnackBar(SnackBar(
-  //   content: Text(message),
-  //   duration: Duration(milliseconds: 1500),
-  // ));
 }
 
 final GlobalKey<ScaffoldState> homeScaffoldKey = GlobalKey<ScaffoldState>();

@@ -10,16 +10,11 @@ class Wrapper extends StatelessWidget {
     try {
       final userProfile = Provider.of<UserProfile>(context);
 
-      print('*****wrapper build called, user: ' + (userProfile?.userId ?? ''));
-
       if (userProfile == null) {
-        print('null user');
         return SignIn();
       } else if (userProfile.userStatus == false) {
-        print('deactiavted user');
         return SignIn();
       } else {
-        print('active user');
         return Home();
       }
     } on Exception catch (e) {

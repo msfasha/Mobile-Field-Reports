@@ -62,4 +62,5 @@ class Globals {
     'Old Pipe',
     'Bad Installation'
   ];
+  static bool locationPerissionGranted = false;
 }

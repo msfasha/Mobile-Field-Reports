@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:ufr/models/user_profile.dart';
 import 'package:ufr/screens/authenticate/register.dart';
 import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/loading.dart';
 import 'package:flutter/material.dart';
+import 'package:ufr/shared/modules.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -48,8 +48,7 @@ class _SignInState extends State<SignIn> {
             appBar: AppBar(
               backgroundColor: Colors.blue[400],
               elevation: 0.0,
-              title: Text('Sign in using your credentials',
-                  style: TextStyle(fontSize: 16)),
+              //title: Text('Sign In', style: TextStyle(fontSize: 16)),
               actions: <Widget>[
                 FlatButton.icon(
                   icon: Icon(Icons.person, color: Colors.white),
@@ -123,33 +122,17 @@ class _SignInState extends State<SignIn> {
   }
 
   void asyncLogin() async {
-    try {
-      print('async login called');
-      if (_formKey.currentState.validate()) {
-        print('start');
-        setState(() => _loading = true);
+    OperationResult or = OperationResult();
+    if (_formKey.currentState.validate()) {
+      setState(() => _loading = true);
 
-        //After successfull login, this screen will be replaced by home screen by wrapper
-        await AuthService.signInWithEmailAndPassword(_email, _password);
-      }
-    } on Exception catch (e) {
-      String errMsg = e.toString();
-      if (e is FirebaseAuthException) {
-        if (e.code == 'invalid-email') {
-          errMsg = 'email address is invalid, enter a valid email';
-        } else if (e.code == 'user-not-found') {
-          errMsg = 'Invalid credentials..';
-        } else if (e.code == 'wrong-password') {
-          errMsg = 'Invalid credentials';
-        } else {
-          errMsg = e.toString();
-        }
-      } else {
-        errMsg = e.toString();
-      }
+      //After successfull login, this screen will be replaced by home screen by wrapper
+      or = await AuthService.signInWithEmailAndPassword(_email, _password);
+    }
 
+    if (or.operationCode == OperationResultCodeEnum.Error) {
       setState(() {
-        _message = errMsg;
+        _message = or.message;
         _loading = false;
       });
     }

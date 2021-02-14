@@ -5,36 +5,8 @@ import 'package:ufr/models/user_profile.dart';
 
 import 'modules.dart';
 
-class TestService {
-  //******************************************************** */
-  static Future<String> deleteRecord() {
-    return Future.delayed(Duration(milliseconds: 2000))
-        .then((value) => ('then finished'));
-
-    //timedelay();
-    //return 'Done';
-    //.then((value) => value); //.then((value) => value);
-    //return ''; //.then((value) => 'Done from then');
-    //return ('Done');
-  }
-
-  static String myMethod() {
-    timedelay();
-    return 'Done';
-    //.then((value) => value); //.then((value) => value);
-    //return ''; //.then((value) => 'Done from then');
-    //return ('Done');
-  }
-
-  static Future<String> timedelay() {
-    return Future.delayed(Duration(milliseconds: 2000))
-        .then((value) => ('second then finished'));
-  }
-  //********************************************************
-}
-
 class AuthService {
-  static Future<UserProfile> getUserProfileFromFirebaseUser(
+  static Future<UserProfile> _parseUserProfileFromFirebaseUser(
       authLib.User user) async {
     try {
       if (user == null) return null;
@@ -62,62 +34,95 @@ class AuthService {
       else
         return null;
     } on Exception catch (e) {
-      throw e;
+      DataService.logError(user.uid, e.toString());
+      return null;
     }
   }
 
   // auth change user stream
   static Stream<UserProfile> get user {
     try {
-      print('auth changed');
       Stream<authLib.User> myStream =
           authLib.FirebaseAuth.instance.authStateChanges();
       return myStream
-          .asyncMap((event) => getUserProfileFromFirebaseUser(event));
+          .asyncMap((event) => _parseUserProfileFromFirebaseUser(event));
     } on Exception catch (e) {
-      throw e;
-    }
-  }
-
-  // sign in anon
-  static Future signInAnon() async {
-    try {
-      authLib.UserCredential result =
-          await authLib.FirebaseAuth.instance.signInAnonymously();
-      authLib.User user = result.user;
-      return getUserProfileFromFirebaseUser(user);
-    } catch (e) {
-      throw e;
+      DataService.logError('', e.toString());
+      return null;
     }
   }
 
   // sign in with email and password
   static Future signInWithEmailAndPassword(
       String email, String password) async {
+    OperationResult or = OperationResult();
     try {
       authLib.UserCredential result = await authLib.FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
       authLib.User user = result.user;
-      return user;
-    } catch (e) {
-      throw e;
+
+      or.operationCode = OperationResultCodeEnum.Success;
+      or.content = user;
+      return or;
+    } on Exception catch (e) {
+      String errMsg = e.toString();
+      if (e is authLib.FirebaseAuthException) {
+        if (e.code == 'invalid-email') {
+          errMsg = 'email address is invalid, enter a valid email';
+        } else if (e.code == 'user-not-found') {
+          errMsg = 'Invalid credentials..';
+        } else if (e.code == 'wrong-password') {
+          errMsg = 'Invalid credentials';
+        } else {
+          errMsg = e.toString();
+        }
+      } else {
+        errMsg = e.toString();
+      }
+
+      or.operationCode = OperationResultCodeEnum.Error;
+      or.message = errMsg;
+      return or;
     }
   }
 
   // register with email and password
   static Future registerWithEmailAndPassword(String email, String password,
       String organizationId, String personName, String phoneNumber) async {
+    OperationResult or = OperationResult();
     try {
       authLib.UserCredential result = await authLib.FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
 
       // create a new document for the user with the uid
-      DataService.updateUserProfile(result.user.uid, organizationId, personName,
-          phoneNumber, result.user.email);
+      or = await DataService.updateUserProfile(result.user.uid, organizationId,
+          personName, phoneNumber, result.user.email);
 
-      return getUserProfileFromFirebaseUser(result.user);
+      if (or.operationCode == OperationResultCodeEnum.Error) return or;
+
+      or.content = _parseUserProfileFromFirebaseUser(result.user);
+      or.operationCode = OperationResultCodeEnum.Success;
+
+      return or;
     } on Exception catch (e) {
-      throw e;
+      String errMsg = e.toString();
+      if (e is authLib.FirebaseAuthException) {
+        if (e.code == 'invalid-email') {
+          errMsg = 'email address is invalid, enter a valid email';
+        } else if (e.code == 'user-not-found') {
+          errMsg = 'Invalid credentials..';
+        } else if (e.code == 'wrong-password') {
+          errMsg = 'Invalid credentials';
+        } else {
+          errMsg = e.toString();
+        }
+      } else {
+        errMsg = e.toString();
+      }
+
+      or.operationCode = OperationResultCodeEnum.Error;
+      or.message = errMsg;
+      return or;
     }
   }
 
@@ -143,6 +148,27 @@ class DataService {
     }
   }
 
+  static Future<OperationResult> getPersonNameById(String uid) async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('user_profile')
+          .doc(uid)
+          .get();
+
+      OperationResult or = OperationResult();
+      or.operationCode = OperationResultCodeEnum.Success;
+      or.content = doc.data()['person_name'];
+
+      return or;
+    } catch (e) {
+      OperationResult or = OperationResult();
+      or.operationCode = OperationResultCodeEnum.Error;
+      or.content = 'Could not resolve person name';
+      or.message = e.toString();
+      return or;
+    }
+  }
+
   static Future<DocumentSnapshot> getOrganizationByOrganizationId(
       String organizationId) {
     try {
@@ -155,10 +181,15 @@ class DataService {
     }
   }
 
-  static Future<void> updateUserProfile(String userId, String organizationId,
-      String personName, String phoneNumber, String email) {
+  static Future<OperationResult> updateUserProfile(
+      String userId,
+      String organizationId,
+      String personName,
+      String phoneNumber,
+      String email) async {
+    OperationResult or = OperationResult();
     try {
-      return FirebaseFirestore.instance
+      await FirebaseFirestore.instance
           .collection('user_profile')
           .doc(userId)
           .set({
@@ -172,38 +203,80 @@ class DataService {
         'user_status_date': DateTime.now(),
         'status_changed_by': 'system',
       });
+
+      or.operationCode = OperationResultCodeEnum.Success;
+
+      return or;
     } on Exception catch (e) {
-      throw e;
+      or.message = e.toString();
+      or.operationCode = OperationResultCodeEnum.Error;
+
+      return or;
     }
   }
 
-  static Future<DocumentReference> createReport(Report report) {
-    return FirebaseFirestore.instance.collection('report').add({
-      'user_id': report.userId,
-      'organization_id': report.organizationId,
-      'time': report.time,
-      'address': report.address,
-      'location_geopoint': report.locationGeoPoint,
-      'image_url': report.imageURL,
-      'material': report.material,
-      'diameter': report.diameter,
-      'cause': report.cause
-    });
+  static Future<void> logError(String userId, String description) {
+    try {
+      return FirebaseFirestore.instance.collection('errors').add({
+        'user_id': userId,
+        'description': description,
+        'time': DateTime.now(),
+      });
+    } on Exception catch (e) {
+      print(e.toString());
+      return null;
+    }
   }
 
-  static Future<void> updateReport(Report report) {
-    return FirebaseFirestore.instance
-        .collection('report')
-        .doc(report.rid)
-        .update({
-      'time': report.time,
-      'address': report.address,
-      'location_geopoint': report.locationGeoPoint,
-      'image_url': report.imageURL,
-      'material': report.material,
-      'diameter': report.diameter,
-      'cause': report.cause
-    });
+  static Future<OperationResult> createReport(Report report) async {
+    OperationResult or = OperationResult();
+    try {
+      DocumentReference ref =
+          await FirebaseFirestore.instance.collection('report').add({
+        'user_id': report.userId,
+        'organization_id': report.organizationId,
+        'time': report.time,
+        'address': report.address,
+        'location_geopoint': report.locationGeoPoint,
+        'image_url': report.imageURL,
+        'material': report.material,
+        'diameter': report.diameter,
+        'cause': report.cause
+      });
+      or.operationCode = OperationResultCodeEnum.Success;
+      or.content = ref;
+
+      return or;
+    } catch (e) {
+      or.operationCode = OperationResultCodeEnum.Error;
+      or.message = e.toString();
+      return or;
+    }
+  }
+
+  static Future<OperationResult> updateReport(Report report) async {
+    OperationResult or = OperationResult();
+    try {
+      await FirebaseFirestore.instance
+          .collection('report')
+          .doc(report.rid)
+          .update({
+        'time': report.time,
+        'address': report.address,
+        'location_geopoint': report.locationGeoPoint,
+        'image_url': report.imageURL,
+        'material': report.material,
+        'diameter': report.diameter,
+        'cause': report.cause
+      });
+
+      or.operationCode = OperationResultCodeEnum.Success;
+      return or;
+    } catch (e) {
+      or.operationCode = OperationResultCodeEnum.Error;
+      or.message = e.toString();
+      return or;
+    }
   }
 
   static deleteReport(String reportId) {

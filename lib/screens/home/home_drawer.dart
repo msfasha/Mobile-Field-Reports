@@ -81,7 +81,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   leading: Icon(Icons.admin_panel_settings),
                   title: Text('Manage users'),
                   onTap: () {
-                    showADialog(context, "Users management console");
+                    showMessageDialog(context, "Users management console");
                   },
                 )
               : Container(),
@@ -89,7 +89,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             leading: Icon(Icons.info),
             title: Text('About'),
             onTap: () {
-              showADialog(context, "ME Application");
+              showMessageDialog(context, "ME Application");
             },
           ),
           ListTile(

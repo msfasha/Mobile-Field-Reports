@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:ufr/screens/authenticate/wrapper.dart';
 import 'package:ufr/shared/firebase_services.dart';
@@ -30,17 +29,6 @@ class _RegisterState extends State<Register> {
   String _organizationId;
 
   @override
-  void initState() {
-    super.initState();
-    // DatabaseService().utilities.then((foo)
-    // {
-    //   setState(() {
-    //     //_utilList = foo;
-    //   });
-    // });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return _loading
         ? Loading()
@@ -50,8 +38,7 @@ class _RegisterState extends State<Register> {
             appBar: AppBar(
               backgroundColor: Colors.blue[400],
               elevation: 0.0,
-              title:
-                  Text('Register a new user', style: TextStyle(fontSize: 16)),
+              //title: Text('New user', style: TextStyle(fontSize: 16)),
               actions: <Widget>[
                 FlatButton.icon(
                   icon: Icon(Icons.person, color: Colors.white),
@@ -239,41 +226,24 @@ class _RegisterState extends State<Register> {
   }
 
   void onPressRegister() async {
-    try {
-      if (_formKey.currentState.validate()) {
-        setState(() => _loading = true);
-        await AuthService.registerWithEmailAndPassword(
-            _email, _password, _organizationId, _personName, _phoneNumber);
-
-        AuthService.signOut();
+    OperationResult or = OperationResult();
+    if (_formKey.currentState.validate()) {
+      setState(() => _loading = true);
+      or = await AuthService.registerWithEmailAndPassword(
+          _email, _password, _organizationId, _personName, _phoneNumber);
+      if (or.operationCode == OperationResultCodeEnum.Success) {
         setState(() {
           _loading = false;
           _message = 'User was created successfully, ' +
               'call system support to activate your user then login using the Sign In screen';
         });
-
-        // Navigator.pushReplacement(
-        //     context, MaterialPageRoute(builder: (context) => SignIn()));
-
+        AuthService.signOut();
+      } else if (or.operationCode == OperationResultCodeEnum.Error) {
+        setState(() {
+          _loading = false;
+          _error = or.message;
+        });
       }
-    } on Exception catch (e) {
-      String errMsg = e.toString();
-      if (e is FirebaseAuthException) {
-        if (e.code == 'email-already-in-use') {
-          errMsg = 'email already in use, try another email';
-        }
-        if (e.code == 'weak-password') {
-          errMsg = 'password is weak, chose another password';
-        }
-        if (e.code == 'invalid-email') {
-          errMsg = 'email address is invalid, enter a valid email address';
-        }
-      }
-
-      setState(() {
-        _loading = false;
-        _error = errMsg;
-      });
     }
   }
 }

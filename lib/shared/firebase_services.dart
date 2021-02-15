@@ -60,7 +60,7 @@ class AuthService {
       authLib.UserCredential result = await authLib.FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
       authLib.User user = result.user;
-
+      
       or.operationCode = OperationResultCodeEnum.Success;
       or.content = user;
       return or;

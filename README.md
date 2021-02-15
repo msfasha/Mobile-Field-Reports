@@ -21,7 +21,10 @@ Add download image functionality.
 add delete confirmation before deleting report.
 add to user profile:  
 admin functionalities, perissiom system.
+End application, exit from memory.
+Change organization to agency.
 Checkup todos.
+
 
 
 Additional Enhancements:

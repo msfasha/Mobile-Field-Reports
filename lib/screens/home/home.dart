@@ -3,10 +3,12 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:ufr/models/report.dart';
 import 'package:ufr/models/user_profile.dart';
+import 'package:ufr/screens/home/app_settings.dart';
 import 'package:ufr/screens/home/home_drawer.dart';
 import 'package:ufr/screens/home/report_entry.dart';
 import 'package:ufr/screens/home/report_map_listing.dart';
 import 'package:ufr/screens/home/report_tile_listing.dart';
+import 'package:ufr/screens/home/user_management.dart';
 import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/globals.dart';
 import 'package:ufr/shared/modules.dart';
@@ -69,7 +71,10 @@ class _HomeState extends State<Home> {
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.settings),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => AppSettings()));
+                },
               ),
             ],
             bottom: PreferredSize(

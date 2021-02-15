@@ -17,9 +17,9 @@ class AuthService {
       if (userProfileDoc.exists)
         return UserProfile(
             userId: user.uid,
-            organizationId: userProfileDoc.data()['organization_id'],
-            organizationName: await DataService.getOrganizationByOrganizationId(
-                    userProfileDoc.data()['organization_id'])
+            agencyId: userProfileDoc.data()['agency_id'],
+            agencyName: await DataService.getAgencyByagencyId(
+                    userProfileDoc.data()['agency_id'])
                 .then((value) {
               return value.data()['name'];
             }),
@@ -60,7 +60,7 @@ class AuthService {
       authLib.UserCredential result = await authLib.FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
       authLib.User user = result.user;
-      
+
       or.operationCode = OperationResultCodeEnum.Success;
       or.content = user;
       return or;
@@ -88,14 +88,14 @@ class AuthService {
 
   // register with email and password
   static Future registerWithEmailAndPassword(String email, String password,
-      String organizationId, String personName, String phoneNumber) async {
+      String agencyId, String personName, String phoneNumber) async {
     OperationResult or = OperationResult();
     try {
       authLib.UserCredential result = await authLib.FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
 
       // create a new document for the user with the uid
-      or = await DataService.updateUserProfile(result.user.uid, organizationId,
+      or = await DataService.updateUserProfile(result.user.uid, agencyId,
           personName, phoneNumber, result.user.email);
 
       if (or.operationCode == OperationResultCodeEnum.Error) return or;
@@ -169,12 +169,11 @@ class DataService {
     }
   }
 
-  static Future<DocumentSnapshot> getOrganizationByOrganizationId(
-      String organizationId) {
+  static Future<DocumentSnapshot> getAgencyByagencyId(String agencyId) {
     try {
       return FirebaseFirestore.instance
-          .collection('organization')
-          .doc(organizationId)
+          .collection('agency')
+          .doc(agencyId)
           .get();
     } on Exception catch (e) {
       throw e;
@@ -183,7 +182,7 @@ class DataService {
 
   static Future<OperationResult> updateUserProfile(
       String userId,
-      String organizationId,
+      String agencyId,
       String personName,
       String phoneNumber,
       String email) async {
@@ -193,7 +192,7 @@ class DataService {
           .collection('user_profile')
           .doc(userId)
           .set({
-        'organization_id': organizationId,
+        'agency_id': agencyId,
         'person_name': personName,
         'phone_number': phoneNumber,
         'email': email,
@@ -234,7 +233,7 @@ class DataService {
       DocumentReference ref =
           await FirebaseFirestore.instance.collection('report').add({
         'user_id': report.userId,
-        'organization_id': report.organizationId,
+        'agency_id': report.agencyId,
         'time': report.time,
         'address': report.address,
         'location_geopoint': report.locationGeoPoint,
@@ -297,7 +296,7 @@ class DataService {
         return Report(
             rid: doc.id,
             userId: doc.data()['user_id'],
-            organizationId: doc.data()['organization_id'],
+            agencyId: doc.data()['agency_id'],
             time: doc.data()['time'],
             address: doc.data()['address'],
             locationGeoPoint: doc.data()['location_geopoint'],
@@ -317,7 +316,7 @@ class DataService {
       return Report(
           rid: snapshot.id,
           userId: snapshot.data()['user_id'],
-          organizationId: snapshot.data()['organization_id'],
+          agencyId: snapshot.data()['agency_id'],
           time: snapshot.data()['time'],
           address: snapshot.data()['address'],
           locationGeoPoint: snapshot.data()['location_geopoint'],
@@ -331,11 +330,11 @@ class DataService {
   }
 
   // get reports stream
-  static Stream<List<Report>> getReportsStream(String organizationId) {
+  static Stream<List<Report>> getReportsStream(String agencyId) {
     try {
       return FirebaseFirestore.instance
           .collection('report')
-          .where('organization_id', isEqualTo: organizationId)
+          .where('agency_id', isEqualTo: agencyId)
           .orderBy('time', descending: true)
           .snapshots()
           .map(_reportListFromSnapshot);
@@ -344,11 +343,11 @@ class DataService {
     }
   }
 
-  static Future<QuerySnapshot> getReportsSnapshot(String organizationId) {
+  static Future<QuerySnapshot> getReportsSnapshot(String agencyId) {
     try {
       return FirebaseFirestore.instance
           .collection('report')
-          .where('organization_id', isEqualTo: organizationId)
+          .where('agency_id', isEqualTo: agencyId)
           .orderBy('time', descending: true)
           .get();
     } on Exception catch (e) {
@@ -369,9 +368,9 @@ class DataService {
     });
   }
 
-  static Future<QuerySnapshot> get organizations {
+  static Future<QuerySnapshot> get agencies {
     try {
-      return FirebaseFirestore.instance.collection('organization').get();
+      return FirebaseFirestore.instance.collection('agency').get();
       //.then((value) => value);
     } on Exception catch (e) {
       throw e;

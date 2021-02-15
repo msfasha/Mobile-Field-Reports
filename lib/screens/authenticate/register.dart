@@ -26,7 +26,7 @@ class _RegisterState extends State<Register> {
   String _confirmPassword;
   String _personName;
   String _phoneNumber;
-  String _organizationId;
+  String _agencyId;
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +158,7 @@ class _RegisterState extends State<Register> {
                     ),
                     SizedBox(height: 10.0),
                     FutureBuilder<QuerySnapshot>(
-                        future: DataService.organizations,
+                        future: DataService.agencies,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData)
                             return const Center(
@@ -169,27 +169,27 @@ class _RegisterState extends State<Register> {
                               alignment: Alignment.centerLeft,
                               child: DropdownButtonFormField(
                                   decoration: InputDecoration(
-                                      labelText: 'Organization',
-                                      hintText: 'Select organization',
+                                      labelText: 'agency',
+                                      hintText: 'Select agency',
                                       hintStyle: TextStyle(
                                           fontSize: 12.0, color: Colors.grey)),
-                                  value: _organizationId,
+                                  value: _agencyId,
                                   validator: (val) => (val == null)
-                                      ? 'Select Organization/Utility'
+                                      ? 'Select Agency/Utility'
                                       : null,
                                   //isDense: true,
                                   onChanged: (value) {
                                     setState(() {
-                                      //_organizationId = int.parse(value.toString());
-                                      _organizationId = value;
+                                      //_agencyId = int.parse(value.toString());
+                                      _agencyId = value;
                                     });
                                   },
                                   items: snapshot.data.docs
                                       .map((document) => DropdownMenuItem(
-                                          // value: document.data['organization_id'],
+                                          // value: document.data['agency_id'],
                                           // child: Text(document.data['plant_name']),
                                           value: document.id,
-                                          //value: document['organization_id'],
+                                          //value: document['agency_id'],
                                           child: Text(document['name'] ?? '')))
                                       .toList()),
                             );
@@ -230,7 +230,7 @@ class _RegisterState extends State<Register> {
     if (_formKey.currentState.validate()) {
       setState(() => _loading = true);
       or = await AuthService.registerWithEmailAndPassword(
-          _email, _password, _organizationId, _personName, _phoneNumber);
+          _email, _password, _agencyId, _personName, _phoneNumber);
       if (or.operationCode == OperationResultCodeEnum.Success) {
         setState(() {
           _loading = false;

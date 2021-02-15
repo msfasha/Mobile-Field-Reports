@@ -117,7 +117,7 @@ class _ReportEntryState extends State<ReportEntry> {
     final user = Provider.of<UserProfile>(context, listen: false);
     Report report = Report(
         userId: user.userId,
-        organizationId: user.organizationId,
+        agencyId: user.agencyId,
         time: _reportTimeStamp,
         address: _reportAddress,
         locationGeoPoint: _reportLocationGeoPoint,
@@ -182,8 +182,8 @@ class _ReportEntryState extends State<ReportEntry> {
     }
   }
 
-  _toggleCameraGallerySelection(ImageCapturingMethodEnum imageCapturingMethod,
-      String organizationId) async {
+  _toggleCameraGallerySelection(
+      ImageCapturingMethodEnum imageCapturingMethod, String agencyId) async {
     try {
       var capturedFile;
 
@@ -233,7 +233,7 @@ class _ReportEntryState extends State<ReportEntry> {
                     title: Text("Camera photo"),
                     onTap: () {
                       _toggleCameraGallerySelection(
-                          ImageCapturingMethodEnum.Camera, user.organizationId);
+                          ImageCapturingMethodEnum.Camera, user.agencyId);
                       Navigator.pop(context);
                     },
                   ),
@@ -242,8 +242,7 @@ class _ReportEntryState extends State<ReportEntry> {
                     title: Text("Photo gallery"),
                     onTap: () {
                       _toggleCameraGallerySelection(
-                          ImageCapturingMethodEnum.PhotoLibrary,
-                          user.organizationId);
+                          ImageCapturingMethodEnum.PhotoLibrary, user.agencyId);
                       Navigator.pop(context);
                     },
                   )

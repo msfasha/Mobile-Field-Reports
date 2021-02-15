@@ -1,6 +1,6 @@
-class Organization {
+class Agency {
   String id;
   String name;
 
-  Organization({this.id, this.name});
+  Agency({this.id, this.name});
 }

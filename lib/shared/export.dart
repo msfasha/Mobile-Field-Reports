@@ -11,7 +11,7 @@ import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/modules.dart';
 
 class ExportFromFireStore {
-  static exportToCSV(String organizationId, BuildContext context) async {
+  static exportToCSV(String agencyId, BuildContext context) async {
     try {
       var status = await Permission.storage.status;
 
@@ -38,9 +38,9 @@ class ExportFromFireStore {
       //IOSink sink = file.openWrite(encoding: Encoding.getByName('utf8'));
 
       QuerySnapshot querySnapshot =
-          await DataService.getReportsSnapshot(organizationId);
+          await DataService.getReportsSnapshot(agencyId);
 
-      String row = 'organization_id' +
+      String row = 'agency_id' +
           ',' +
           'time' +
           ',' +
@@ -59,8 +59,8 @@ class ExportFromFireStore {
 
       querySnapshot.docs.forEach((element) async {
         row = row +
-            (element.data()['organization_id'] != null
-                ? element.data()['organization_id'].toString()
+            (element.data()['agency_id'] != null
+                ? element.data()['agency_id'].toString()
                 : '') +
             ',' +
             (element.data()['time'] != null

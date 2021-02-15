@@ -2,12 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserProfile {
   String userId;
-  String organizationId;
-  String organizationName;
+  String agencyId;
+  String agencyName;
   String personName;
   String phoneNumber;
   String email;
-  String userCategory; //normal user, organization admin, system admin.
+  String userCategory; //normal user, agency admin, system admin.
   Timestamp creationDate;
   bool userStatus;
   Timestamp userStatusDate;
@@ -15,12 +15,12 @@ class UserProfile {
 
   UserProfile(
       {this.userId,
-      this.organizationId,
-      this.organizationName,
+      this.agencyId,
+      this.agencyName,
       this.personName,
       this.phoneNumber,
       this.email,
-      this.userCategory, //normal user, organization admin, system admin.
+      this.userCategory, //normal user, agency admin, system admin.
       this.creationDate,
       this.userStatus, //true or false, activated and deactivated
       this.userStatusDate,

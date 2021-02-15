@@ -8,7 +8,6 @@ import 'package:ufr/screens/home/home_drawer.dart';
 import 'package:ufr/screens/home/report_entry.dart';
 import 'package:ufr/screens/home/report_map_listing.dart';
 import 'package:ufr/screens/home/report_tile_listing.dart';
-import 'package:ufr/screens/home/user_management.dart';
 import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/globals.dart';
 import 'package:ufr/shared/modules.dart';
@@ -50,7 +49,7 @@ class _HomeState extends State<Home> {
     _requestMapLocationPemmission();
     final user = Provider.of<UserProfile>(context);
     return StreamProvider<List<Report>>.value(
-      value: DataService.getReportsStream(user.organizationId),
+      value: DataService.getReportsStream(user.agencyId),
       catchError: (context, e) {
         return [];
       },
@@ -65,7 +64,7 @@ class _HomeState extends State<Home> {
               },
               tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
             ),
-            title: Text(user.organizationName),
+            title: Text(user.agencyName),
             backgroundColor: Colors.blue[400],
             elevation: 0.0,
             actions: <Widget>[

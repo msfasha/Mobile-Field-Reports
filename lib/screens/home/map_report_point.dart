@@ -59,7 +59,6 @@ class MapReportPointState extends State<MapReportPoint> {
       key: customMapScafoldKey,
       appBar: AppBar(
         title: Text('Select Location'),
-        backgroundColor: Colors.blue[400],
         elevation: 0.0,
       ),
       body: Stack(

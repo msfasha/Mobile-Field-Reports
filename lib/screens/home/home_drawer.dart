@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:ufr/models/user_profile.dart';
 import 'package:ufr/screens/authenticate/change_password.dart';
-import 'package:ufr/screens/home/user_management.dart';
+import 'package:ufr/screens/authenticate/user_management.dart';
 import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/export.dart';
 import 'package:ufr/shared/modules.dart';
@@ -68,12 +68,12 @@ class _HomeDrawerState extends State<HomeDrawer> {
             onTap: () async {
               setState(() {
                 _exportTitle = SpinKitThreeBounce(
-                  color: Colors.blue,
+                  color: Theme.of(context).accentColor,
                   size: 20.0,
                 );
               });
 
-              ExportFromFireStore.exportToCSV(user.agencyId, context);
+              await ExportFromFireStore.exportToCSV(user.agencyId, context);
 
               Navigator.pop(context);
             },

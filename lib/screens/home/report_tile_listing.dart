@@ -35,7 +35,6 @@ class _ReportTileListingState extends State<ReportTileListing> {
     return Card(
       margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
       child: ListTile(
-        selectedTileColor: Colors.blueGrey,
         leading: report.imageURL != null
             ? IconButton(
                 icon: Icon(Icons.photo_library),
@@ -92,7 +91,7 @@ class _ReportTileListingState extends State<ReportTileListing> {
                       OperationResult or;
                       setState(() => _loadingEffect = true);
 
-                      or = await DataService.getPersonNameById(report.userId);
+                      or = await DataService.getPersonNameByUserId(report.userId);
                       String personName;
 
                       if (or.operationCode == OperationResultCodeEnum.Success)

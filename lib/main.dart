@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ufr/screens/authenticate/wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:ufr/shared/firebase_services.dart';
+import 'package:ufr/shared/globals.dart';
 import 'models/user_profile.dart';
 
 void main() async {
@@ -49,18 +51,30 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  getAgencies() async {
+    try {
+      QuerySnapshot agenciesSnapShot = await DataService.agencies;
+      if (agenciesSnapShot.size > 0)
+        Globals.agenciesSnapshot = agenciesSnapShot;
+    } catch (e) {
+      Globals.agenciesSnapshot = null;
+    }
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    //get agencies
+    getAgencies();
     return StreamProvider<UserProfile>.value(
       value: AuthService.user,
       catchError: (context, e) {
-        print('*#*#*#*#*#* : ' + e.toString());
+        print('MyApp Error: ' + e.toString());
         return null;
       },
       child: MaterialApp(
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.green,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         debugShowCheckedModeBanner: false,

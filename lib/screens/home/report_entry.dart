@@ -272,7 +272,6 @@ class _ReportEntryState extends State<ReportEntry> {
       key: reportFormScaffoldKey,
       appBar: AppBar(
         title: Text('Report Information'),
-        backgroundColor: Colors.blue[400],
         elevation: 0.0,
       ),
       body: _loadingEffect == true
@@ -321,8 +320,6 @@ class _ReportEntryState extends State<ReportEntry> {
                       decoration: InputDecoration(
                         labelText: 'ِAddress',
                         hintText: 'Enter address information',
-                        hintStyle:
-                            TextStyle(fontSize: 12.0, color: Colors.grey),
                       ),
                       validator: (val) => (val != null && val.isEmpty)
                           ? 'Enter address information'
@@ -461,10 +458,8 @@ class _ReportEntryState extends State<ReportEntry> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           RaisedButton(
-                              color: Colors.blue[400],
                               child: Text(
                                 'Save',
-                                style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () async {
                                 OperationResult or;
@@ -487,10 +482,8 @@ class _ReportEntryState extends State<ReportEntry> {
                                 }
                               }),
                           RaisedButton(
-                              color: Colors.blue[400],
                               child: Text(
                                 'Delete',
-                                style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () async {
                                 setState(() => _loadingEffect = true);
@@ -498,10 +491,8 @@ class _ReportEntryState extends State<ReportEntry> {
                                 Navigator.pop(context);
                               }),
                           RaisedButton(
-                              color: Colors.blue[400],
                               child: Text(
                                 'Cancel',
-                                style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () {
                                 Navigator.pop(context);

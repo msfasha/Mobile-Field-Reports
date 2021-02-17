@@ -45,8 +45,14 @@ class _HomeState extends State<Home> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
     _requestMapLocationPemmission();
+
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final user = Provider.of<UserProfile>(context);
     return StreamProvider<List<Report>>.value(
       value: DataService.getReportsStream(user.agencyId),
@@ -65,11 +71,10 @@ class _HomeState extends State<Home> {
               tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
             ),
             title: Text(user.agencyName),
-            backgroundColor: Colors.blue[400],
             elevation: 0.0,
             actions: <Widget>[
               IconButton(
-                icon: Icon(Icons.settings),
+                icon: Icon(Icons.more_vert),
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => AppSettings()));
@@ -114,7 +119,6 @@ class _HomeState extends State<Home> {
                 MaterialPageRoute(builder: (context) => ReportEntry()));
           },
           child: Icon(Icons.add),
-          backgroundColor: Colors.blue,
         ),
       ),
     );

@@ -138,8 +138,10 @@ class _ReportDisplayState extends State<ReportDisplay> {
                                         )),
                               );
                             } catch (e) {
-                              DataService.logError(
-                                  widget.report.rid, e.toString());
+                              logInFireStore(
+                                  message: e.toString(),
+                                  logType: LogTypeEnum.Error,
+                                  context: context);
                             }
                           }),
                     ],

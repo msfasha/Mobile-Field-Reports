@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:ufr/models/report.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as authLib;
@@ -5,49 +7,80 @@ import 'package:ufr/models/user_profile.dart';
 
 import 'modules.dart';
 
-class AuthService {
-  static Future<UserProfile> _parseUserProfileFromFirebaseUser(
-      authLib.User user) async {
-    try {
-      if (user == null) return null;
+UserProfile mapFirebaseUserToUserProfile(DocumentSnapshot doc) {
+  return UserProfile(
+      userId: doc.id,
+      agencyId: doc.data()['agency_id'],
+      personName: doc.data()['person_name'],
+      phoneNumber: doc.data()['phone_number'],
+      email: doc.data()['email'],
+      userCategory: doc.data()['user_category'],
+      creationDate: doc.data()['creation_date'],
+      userStatus: doc.data()['user_status'],
+      userStatusDate: doc.data()['user_status_date'],
+      statusChangedBy: doc.data()['status_changed_by']);
+}
 
-      DocumentSnapshot userProfileDoc =
-          await DataService.getUserProfile(user.uid);
+Future<UserProfile> extractUserProfileForFirebaseUser(authLib.User user) async {
+  try {
+    if (user == null) return null;
 
-      if (userProfileDoc.exists)
-        return UserProfile(
-            userId: user.uid,
-            agencyId: userProfileDoc.data()['agency_id'],
-            agencyName: await DataService.getAgencyByagencyId(
-                    userProfileDoc.data()['agency_id'])
-                .then((value) {
-              return value.data()['name'];
-            }),
-            personName: userProfileDoc.data()['person_name'],
-            phoneNumber: userProfileDoc.data()['phone_number'],
-            email: user.email,
-            userCategory: userProfileDoc.data()['user_category'],
-            creationDate: userProfileDoc.data()['creation_date'],
-            userStatus: userProfileDoc.data()['user_status'],
-            userStatusDate: userProfileDoc.data()['user_status_date'],
-            statusChangedBy: userProfileDoc.data()['status_changed_by']);
-      else
-        return null;
-    } on Exception catch (e) {
-      DataService.logError(user.uid, e.toString());
-      return null;
-    }
+    DocumentSnapshot userProfileDoc =
+        await DataService.getUserProfile(user.uid);
+
+    if (!userProfileDoc.exists) return null;
+
+    UserProfile userProfile = mapFirebaseUserToUserProfile(userProfileDoc);
+    userProfile.agencyName = await DataService.getAgencyNameByAgencyId(
+            userProfileDoc.data()['agency_id'])
+        .then((value) {
+      return value.data()['name'];
+    });
+
+    return userProfile;
+  } on Exception catch (e) {
+    logInFireStore(message: e.toString(), logType: LogTypeEnum.Error);
+    return null;
   }
+}
 
+enum LogTypeEnum {
+  Info,
+  Warning,
+  Error,
+}
+Future<void> logInFireStore(
+    {LogTypeEnum logType,
+    String message,
+    BuildContext context,
+    String reportId}) {
+  try {
+    UserProfile userProfile;
+    if (context != null) userProfile = Provider.of<UserProfile>(context);
+
+    return FirebaseFirestore.instance.collection('logs').add({
+      'log_type': logType,
+      'message': message,
+      'user_id': userProfile != null ? userProfile.userId : null,
+      'report_id': reportId != null ? reportId : null,
+      'time': DateTime.now(),
+    });
+  } on Exception catch (e) {
+    print(e.toString());
+    return null;
+  }
+}
+
+class AuthService {
   // auth change user stream
   static Stream<UserProfile> get user {
     try {
       Stream<authLib.User> myStream =
           authLib.FirebaseAuth.instance.authStateChanges();
       return myStream
-          .asyncMap((event) => _parseUserProfileFromFirebaseUser(event));
+          .asyncMap((event) => extractUserProfileForFirebaseUser(event));
     } on Exception catch (e) {
-      DataService.logError('', e.toString());
+      logInFireStore(message: e.toString(), logType: LogTypeEnum.Error);
       return null;
     }
   }
@@ -98,10 +131,7 @@ class AuthService {
       or = await DataService.updateUserProfile(result.user.uid, agencyId,
           personName, phoneNumber, result.user.email);
 
-      if (or.operationCode == OperationResultCodeEnum.Error) return or;
-
-      or.content = _parseUserProfileFromFirebaseUser(result.user);
-      or.operationCode = OperationResultCodeEnum.Success;
+      AuthService.signOut();
 
       return or;
     } on Exception catch (e) {
@@ -129,7 +159,8 @@ class AuthService {
   // sign out
   static Future signOut() async {
     try {
-      return await authLib.FirebaseAuth.instance.signOut();
+      if (authLib.FirebaseAuth.instance.currentUser != null)
+        await authLib.FirebaseAuth.instance.signOut();
     } catch (e) {
       throw e;
     }
@@ -148,7 +179,7 @@ class DataService {
     }
   }
 
-  static Future<OperationResult> getPersonNameById(String uid) async {
+  static Future<OperationResult> getPersonNameByUserId(String uid) async {
     try {
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('user_profile')
@@ -169,7 +200,7 @@ class DataService {
     }
   }
 
-  static Future<DocumentSnapshot> getAgencyByagencyId(String agencyId) {
+  static Future<DocumentSnapshot> getAgencyNameByAgencyId(String agencyId) {
     try {
       return FirebaseFirestore.instance
           .collection('agency')
@@ -188,42 +219,71 @@ class DataService {
       String email) async {
     OperationResult or = OperationResult();
     try {
+      UserProfile userProfile = UserProfile(
+        userId: userId,
+        agencyId: agencyId,
+        personName: personName,
+        phoneNumber: phoneNumber,
+        email: email,
+        userCategory: UserCategoryBaseEnum.User.value,
+        creationDate: Timestamp.fromDate(DateTime.now()),
+        userStatus: false,
+        userStatusDate: Timestamp.fromDate(DateTime.now()),
+        statusChangedBy: 'system',
+      );
+
       await FirebaseFirestore.instance
           .collection('user_profile')
           .doc(userId)
           .set({
-        'agency_id': agencyId,
-        'person_name': personName,
-        'phone_number': phoneNumber,
-        'email': email,
-        'user_category': UserCategoryBaseEnum.User.value,
-        'creation_date': DateTime.now(),
-        'user_status': false,
-        'user_status_date': DateTime.now(),
-        'status_changed_by': 'system',
+        'agency_id': userProfile.agencyId,
+        'person_name': userProfile.personName,
+        'phone_number': userProfile.phoneNumber,
+        'email': userProfile.email,
+        'user_category': userProfile.userCategory,
+        'creation_date': userProfile.creationDate,
+        'user_status': userProfile.userStatus,
+        'user_status_date': userProfile.userStatusDate,
+        'status_changed_by': userProfile.statusChangedBy,
+      });
+
+      or.operationCode = OperationResultCodeEnum.Success;
+      or.content = userProfile;
+
+      return or;
+    } on Exception catch (e) {
+      or.operationCode = OperationResultCodeEnum.Error;
+      or.message = e.toString();
+
+      return or;
+    }
+  }
+
+  static Future<OperationResult> updateUserStatus(
+    String userId,
+    bool userStatus,
+    String changedBy,
+  ) async {
+    OperationResult or = OperationResult();
+    try {
+      await FirebaseFirestore.instance
+          .collection('user_profile')
+          .doc(userId)
+          .update({
+        'user_status': userStatus,
+        'user_status_date': Timestamp.fromDate(DateTime.now()),
+        'status_changed_by': changedBy,
       });
 
       or.operationCode = OperationResultCodeEnum.Success;
 
       return or;
     } on Exception catch (e) {
-      or.message = e.toString();
       or.operationCode = OperationResultCodeEnum.Error;
+      or.message = e.toString();
+      print(e.toString());
 
       return or;
-    }
-  }
-
-  static Future<void> logError(String userId, String description) {
-    try {
-      return FirebaseFirestore.instance.collection('errors').add({
-        'user_id': userId,
-        'description': description,
-        'time': DateTime.now(),
-      });
-    } on Exception catch (e) {
-      print(e.toString());
-      return null;
     }
   }
 
@@ -340,6 +400,34 @@ class DataService {
           .map(_reportListFromSnapshot);
     } on Exception catch (e) {
       throw e;
+    }
+  }
+
+  static Future<OperationResult> getUsersProfilesByAgencyId(
+      String agencyId) async {
+    OperationResult or = OperationResult();
+    try {
+      if (agencyId == null) {
+        or.operationCode = OperationResultCodeEnum.Error;
+        or.message = 'Agency id is null';
+        or.content = List<UserProfile>();
+        return or;
+      }
+
+      QuerySnapshot qs = await FirebaseFirestore.instance
+          .collection('user_profile')
+          .where('agency_id', isEqualTo: agencyId)
+          .orderBy('email')
+          .get();
+
+      or.content =
+          qs.docs.map((doc) => (mapFirebaseUserToUserProfile(doc))).toList();
+      or.operationCode = OperationResultCodeEnum.Success;
+      return or;
+    } on Exception catch (e) {
+      or.message = e.toString();
+      or.operationCode = OperationResultCodeEnum.Error;
+      return or;
     }
   }
 

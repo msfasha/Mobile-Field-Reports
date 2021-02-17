@@ -34,9 +34,7 @@ class _RegisterState extends State<Register> {
         ? Loading()
         : Scaffold(
             key: registerScafoldKey,
-            backgroundColor: Colors.white,
             appBar: AppBar(
-              backgroundColor: Colors.blue[400],
               elevation: 0.0,
               //title: Text('New user', style: TextStyle(fontSize: 16)),
               actions: <Widget>[
@@ -63,8 +61,6 @@ class _RegisterState extends State<Register> {
                       decoration: InputDecoration(
                         labelText: 'email',
                         hintText: 'Enter a valid email address',
-                        hintStyle:
-                            TextStyle(fontSize: 12.0, color: Colors.grey),
                       ),
                       validator: validateEmail,
                       keyboardType: TextInputType.emailAddress,
@@ -77,8 +73,6 @@ class _RegisterState extends State<Register> {
                       decoration: InputDecoration(
                         labelText: 'Password',
                         hintText: 'Enter a valid password',
-                        hintStyle:
-                            TextStyle(fontSize: 12.0, color: Colors.grey),
                       ),
                       obscureText: true,
                       validator: (val) {
@@ -104,8 +98,6 @@ class _RegisterState extends State<Register> {
                       decoration: InputDecoration(
                         labelText: 'Confirm Password',
                         hintText: 'Re-enter your password',
-                        hintStyle:
-                            TextStyle(fontSize: 12.0, color: Colors.grey),
                       ),
                       obscureText: true,
                       validator: (val) {
@@ -130,8 +122,6 @@ class _RegisterState extends State<Register> {
                       decoration: InputDecoration(
                         labelText: 'name',
                         hintText: 'Enter your name',
-                        hintStyle:
-                            TextStyle(fontSize: 12.0, color: Colors.grey),
                       ),
                       validator: (val) => (val != null && val.length < 6)
                           ? 'Enter a valid name'
@@ -146,8 +136,6 @@ class _RegisterState extends State<Register> {
                       decoration: InputDecoration(
                         labelText: 'phone number',
                         hintText: 'Enter phone number',
-                        hintStyle:
-                            TextStyle(fontSize: 12.0, color: Colors.grey),
                       ),
                       validator: (val) => (val != null && val.length < 10)
                           ? 'Enter a valid phone number'
@@ -169,10 +157,9 @@ class _RegisterState extends State<Register> {
                               alignment: Alignment.centerLeft,
                               child: DropdownButtonFormField(
                                   decoration: InputDecoration(
-                                      labelText: 'agency',
-                                      hintText: 'Select agency',
-                                      hintStyle: TextStyle(
-                                          fontSize: 12.0, color: Colors.grey)),
+                                    labelText: 'agency',
+                                    hintText: 'Select agency',
+                                  ),
                                   value: _agencyId,
                                   validator: (val) => (val == null)
                                       ? 'Select Agency/Utility'
@@ -197,10 +184,8 @@ class _RegisterState extends State<Register> {
                         }),
                     SizedBox(height: 10.0),
                     RaisedButton(
-                        color: Colors.blue[400],
                         child: Text(
                           'Register',
-                          style: TextStyle(color: Colors.white),
                         ),
                         onPressed: onPressRegister),
                     SizedBox(height: 12.0),
@@ -236,8 +221,7 @@ class _RegisterState extends State<Register> {
           _loading = false;
           _message = 'User was created successfully, ' +
               'call system support to activate your user then login using the Sign In screen';
-        });
-        AuthService.signOut();
+        });        
       } else if (or.operationCode == OperationResultCodeEnum.Error) {
         setState(() {
           _loading = false;

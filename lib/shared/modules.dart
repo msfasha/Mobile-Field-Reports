@@ -84,7 +84,6 @@ dynamic downloadFile(String url) async {
   }
 }
 
-
 Widget createErrorWidget(dynamic exception, StackTrace stackTrace) {
   final FlutterErrorDetails details = FlutterErrorDetails(
     exception: exception,
@@ -187,7 +186,8 @@ class ReportsViewTypeChangeNotifier extends ChangeNotifier {
 
 showSnackBarMessage(String content, GlobalKey<ScaffoldState> scaffoldKey) {
   try {
-    scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(content)));
+    if (scaffoldKey.currentState.mounted)
+      scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(content)));
   } on Exception catch (e) {
     print('Error occured in ShowSnackBar: ${e.toString()}');
   }
@@ -198,3 +198,5 @@ final GlobalKey<ScaffoldState> reportFormScaffoldKey =
     GlobalKey<ScaffoldState>();
 final GlobalKey<ScaffoldState> customMapScafoldKey = GlobalKey<ScaffoldState>();
 final GlobalKey<ScaffoldState> registerScafoldKey = GlobalKey<ScaffoldState>();
+final GlobalKey<ScaffoldState> userManagementScafoldKey =
+    GlobalKey<ScaffoldState>();

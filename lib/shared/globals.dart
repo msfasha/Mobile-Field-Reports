@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Globals {
   static const List<int> diameterList = [
     50,
@@ -63,4 +65,5 @@ class Globals {
     'Bad Installation'
   ];
   static bool locationPerissionGranted = false;
+  static QuerySnapshot agenciesSnapshot;
 }

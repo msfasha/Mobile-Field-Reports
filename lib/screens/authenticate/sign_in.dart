@@ -46,7 +46,6 @@ class _SignInState extends State<SignIn> {
         ? Loading()
         : Scaffold(
             appBar: AppBar(
-              backgroundColor: Colors.blue[400],
               elevation: 0.0,
               //title: Text('Sign In', style: TextStyle(fontSize: 16)),
               actions: <Widget>[
@@ -75,8 +74,6 @@ class _SignInState extends State<SignIn> {
                       decoration: InputDecoration(
                         labelText: 'email',
                         hintText: 'Enter your email address',
-                        hintStyle:
-                            TextStyle(fontSize: 12.0, color: Colors.grey),
                       ),
                       validator: (val) => (val != null && val.isEmpty)
                           ? 'Enter a valid email address'
@@ -91,8 +88,6 @@ class _SignInState extends State<SignIn> {
                       decoration: InputDecoration(
                         labelText: 'Password',
                         hintText: 'Enter your password',
-                        hintStyle:
-                            TextStyle(fontSize: 12.0, color: Colors.grey),
                       ),
                       validator: (val) => (val != null && val.length < 6)
                           ? 'Enter a password 6+ chars long'
@@ -103,10 +98,8 @@ class _SignInState extends State<SignIn> {
                     ),
                     SizedBox(height: 20.0),
                     RaisedButton(
-                        color: Colors.blue[400],
                         child: Text(
                           'Sign In',
-                          style: TextStyle(color: Colors.white),
                         ),
                         onPressed: asyncLogin),
                     SizedBox(height: 12.0),

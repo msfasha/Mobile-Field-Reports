@@ -87,19 +87,22 @@ class _HomeState extends State<Home> {
             actions: <Widget>[
               PopupMenuButton(
                 itemBuilder: (BuildContext bc) => [
-                  PopupMenuItem(
-                      child: AgencyDropDown(
-                    agencyId: _selectedAgency, //make sure this is not static
-                    onChanged: (value) async {
-                      _selectedAgency = value;
-                      String selectAgencyName =
-                          await DataService.getAgencyNameByAgencyId(
-                              _selectedAgency);
-                      setState(() {
-                        _title = 'Viewing: ' + selectAgencyName;
-                      });
-                    },
-                  )),
+                  (_user.userCategory == UserCategoryBaseEnum.SysAdmin.value)
+                      ? PopupMenuItem(
+                          child: AgencyDropDown(
+                          agencyId:
+                              _selectedAgency, //make sure this is not static
+                          onChanged: (value) async {
+                            _selectedAgency = value;
+                            String selectAgencyName =
+                                await DataService.getAgencyNameByAgencyId(
+                                    _selectedAgency);
+                            setState(() {
+                              _title = 'Viewing: ' + selectAgencyName;
+                            });
+                          },
+                        ))
+                      : null,
                   PopupMenuItem(
                       child: Text("Reports Time Period"), value: "get_time"),
                 ],

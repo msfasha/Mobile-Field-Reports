@@ -48,7 +48,7 @@ class _ReportEntryState extends State<ReportEntry> {
   String _reportCause;
 
   String _reportLocationGpsString;
-  PickedFile _capturedFile;
+  PickedFile _diskFile;
 
   _ReportEntryState(this._report);
 
@@ -103,11 +103,10 @@ class _ReportEntryState extends State<ReportEntry> {
 
     if (!_key.currentState.validate()) return or;
 
-    String storagePath;
-    if (_capturedFile != null) {
+    if (_diskFile != null) {
       or = await _uploadImage();
       if (or.operationCode == OperationResultCodeEnum.Success)
-        storagePath = or.content;
+        _reportImageURL = or.content;
       else if (or.operationCode == OperationResultCodeEnum.Error) {
         showSnackBarMessage(or.message, reportFormScaffoldKey);
         return or;
@@ -121,7 +120,7 @@ class _ReportEntryState extends State<ReportEntry> {
         time: _reportTimeStamp,
         address: _reportAddress,
         locationGeoPoint: _reportLocationGeoPoint,
-        imageURL: storagePath,
+        imageURL: _reportImageURL,
         material: _reportMaterial,
         diameter: _reportDiameter,
         cause: _reportCause);
@@ -165,13 +164,13 @@ class _ReportEntryState extends State<ReportEntry> {
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('ufr/')
-          .child('${_capturedFile.path.split('/').last}');
+          .child('${_diskFile.path.split('/').last}');
 
       final metadata = SettableMetadata(
           contentType: 'image/jpeg',
-          customMetadata: {'picked-file-path': _capturedFile.path});
+          customMetadata: {'picked-file-path': _diskFile.path});
 
-      await ref.putFile(File(_capturedFile.path), metadata);
+      await ref.putFile(File(_diskFile.path), metadata);
 
       or.operationCode = OperationResultCodeEnum.Success;
       or.content = ref.fullPath;
@@ -186,25 +185,25 @@ class _ReportEntryState extends State<ReportEntry> {
   _toggleCameraGallerySelection(
       ImageCapturingMethodEnum imageCapturingMethod, String agencyId) async {
     try {
-      var capturedFile;
+      var diskFile;
 
       if (imageCapturingMethod == ImageCapturingMethodEnum.Camera) {
-        capturedFile = await ImagePicker().getImage(
+        diskFile = await ImagePicker().getImage(
             source: ImageSource.camera,
             imageQuality: 50,
             maxHeight: 480,
             maxWidth: 640);
       } else
-        capturedFile = await ImagePicker().getImage(
+        diskFile = await ImagePicker().getImage(
             source: ImageSource.gallery,
             imageQuality: 50,
             maxHeight: 480,
             maxWidth: 640);
 
-      if (capturedFile != null) {
+      if (diskFile != null) {
         setState(() {
           _imageStatus = imageStatusEnum.NewImageCaptured;
-          _capturedFile = capturedFile;
+          _diskFile = diskFile;
         });
       }
     } on Exception catch (e) {
@@ -216,7 +215,7 @@ class _ReportEntryState extends State<ReportEntry> {
   _cancelCapturedImage() {
     setState(() {
       _imageStatus = imageStatusEnum.NoImage;
-      _capturedFile = null;
+      _diskFile = null;
     });
   }
 
@@ -422,13 +421,13 @@ class _ReportEntryState extends State<ReportEntry> {
                                   icon: Icon(Icons.image),
                                   onPressed: () async {
                                     try {
-                                      if (_capturedFile != null) {
+                                      if (_diskFile != null) {
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     DisplayImage(File(
-                                                        _capturedFile.path))));
+                                                        _diskFile.path))));
                                       } else {
                                         setState(() => _loadingEffect = true);
                                         File file =

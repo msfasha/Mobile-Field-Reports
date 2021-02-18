@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:ufr/shared/firebase_services.dart';
+import 'package:provider/provider.dart';
+import 'package:ufr/models/report.dart';
 import 'package:ufr/shared/modules.dart';
 
 class ExportFromFireStore {
@@ -37,8 +37,7 @@ class ExportFromFireStore {
       //IOSink sink = file.openWrite(encoding: Encoding.getByName('utf8'));
       //IOSink sink = file.openWrite(encoding: Encoding.getByName('utf8'));
 
-      QuerySnapshot querySnapshot =
-          await DataService.getReportsSnapshot(agencyId);
+      final reports = Provider.of<List<Report>>(context, listen: false);
 
       String row = 'agency_id' +
           ',' +
@@ -57,40 +56,26 @@ class ExportFromFireStore {
 
       //sink.writeln(row);
 
-      querySnapshot.docs.forEach((element) async {
-        row = row +
-            (element.data()['agency_id'] != null
-                ? element.data()['agency_id'].toString()
-                : '') +
-            ',' +
-            (element.data()['time'] != null
-                ? (element.data()['time'] as Timestamp).toDate().toString()
-                : '') +
-            ',' +
-            (element.data()['address'] != null
-                ? element.data()['address']
-                : '') +
-            ',' +
-            (element.data()['location_geopoint'] != null
-                ? (element.data()['location_geopoint'] as GeoPoint)
-                        .latitude
-                        .toString() +
-                    '-' +
-                    (element.data()['location_geopoint'] as GeoPoint)
-                        .longitude
-                        .toString()
-                : '') +
-            ',' +
-            (element.data()['diameter'] != null
-                ? element.data()['diameter'].toString()
-                : '') +
-            ',' +
-            (element.data()['material'] != null
-                ? element.data()['material']
-                : '') +
-            ',' +
-            (element.data()['cause'] != null ? element.data()['cause'] : '') +
-            '\n';
+      reports.forEach((report) async {
+        row = row + report.agencyId ??
+            ''
+                    ',' +
+                (report.time != null ? report.time.toDate().toString() : '') +
+                ',' +
+                report.address ??
+            ''
+                    ',' +
+                (report.locationGeoPoint != null
+                    ? report.locationGeoPoint.latitude.toString() +
+                        '-' +
+                        report.locationGeoPoint.longitude.toString()
+                    : '') +
+                ',' +
+                (report.diameter != null ? report.diameter.toString() : '') +
+                ',' +
+                report.material ??
+            '' + ',' + report.cause ??
+            '' + '\n';
 
         //sink.writeln(row);
       });

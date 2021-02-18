@@ -59,7 +59,7 @@ class _ReportDisplayState extends State<ReportDisplay> {
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Text(
                     'Address',
@@ -75,7 +75,7 @@ class _ReportDisplayState extends State<ReportDisplay> {
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Text(
                     'Cause',
@@ -91,7 +91,7 @@ class _ReportDisplayState extends State<ReportDisplay> {
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Text(
                     'Diameter',
@@ -107,7 +107,7 @@ class _ReportDisplayState extends State<ReportDisplay> {
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Text(
                     'Location',
@@ -121,16 +121,18 @@ class _ReportDisplayState extends State<ReportDisplay> {
                   ),
                   Row(
                     children: [
-                      Text(
-                          widget.report.locationGeoPoint == null
-                              ? ''
-                              : widget.report.locationGeoPoint.latitude
-                                      .toString() +
-                                  " , " +
-                                  widget.report.locationGeoPoint.longitude
-                                      .toString(),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Flexible(
+                        child: Text(
+                            widget.report.locationGeoPoint == null
+                                ? ''
+                                : widget.report.locationGeoPoint.latitude
+                                        .toString() +
+                                    " , " +
+                                    widget.report.locationGeoPoint.longitude
+                                        .toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
                       IconButton(
                           icon: Icon(Icons.gps_fixed),
                           onPressed: () {
@@ -170,7 +172,7 @@ class _ReportDisplayState extends State<ReportDisplay> {
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Text(
                     'Image',
@@ -207,7 +209,7 @@ class _ReportDisplayState extends State<ReportDisplay> {
                           textAlign: TextAlign.center,
                           style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Text(
                     'User name',
@@ -223,7 +225,7 @@ class _ReportDisplayState extends State<ReportDisplay> {
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(
-                    height: 30,
+                    height: 10,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

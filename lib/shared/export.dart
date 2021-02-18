@@ -33,9 +33,6 @@ class ExportFromFireStore {
           '.csv';
 
       File file = new File(fileFullPath);
-      //IOSink sink = file.openWrite(encoding: Encoding.getByName('utf8'));
-      //IOSink sink = file.openWrite(encoding: Encoding.getByName('utf8'));
-      //IOSink sink = file.openWrite(encoding: Encoding.getByName('utf8'));
 
       final reports = Provider.of<List<Report>>(context, listen: false);
 
@@ -54,35 +51,36 @@ class ExportFromFireStore {
           'cause' +
           '\n';
 
-      //sink.writeln(row);
+      var buffer = new StringBuffer();
+      buffer.write(row);
 
-      reports.forEach((report) async {
-        row = row + report.agencyId ??
-            ''
-                    ',' +
-                (report.time != null ? report.time.toDate().toString() : '') +
-                ',' +
-                report.address ??
-            ''
-                    ',' +
-                (report.locationGeoPoint != null
-                    ? report.locationGeoPoint.latitude.toString() +
-                        '-' +
-                        report.locationGeoPoint.longitude.toString()
-                    : '') +
-                ',' +
-                (report.diameter != null ? report.diameter.toString() : '') +
-                ',' +
-                report.material ??
-            '' + ',' + report.cause ??
-            '' + '\n';
-
-        //sink.writeln(row);
+      reports.forEach((report) {
+        row = (report.agencyId ?? '');
+        row = row + ',';
+        row =
+            row + (report.time != null ? report.time.toDate().toString() : '');
+        row = row + ',';
+        row = row + report.address ?? '';
+        row = row + ',';
+        row = row +
+            (report.locationGeoPoint != null
+                ? report.locationGeoPoint.latitude.toString() +
+                    '-' +
+                    report.locationGeoPoint.longitude.toString()
+                : '');
+        row = row + ',';
+        row = row + (report.diameter != null ? report.diameter.toString() : '');
+        row = row + ',';
+        row = row + report.material ?? '';
+        row = row + ',';
+        row = row + report.cause ?? '';
+        row = row + '\n';
+        buffer.write(row);
+        row = null;
       });
-      //await file.writeAsBytes(utf8.encode(row), flush: true);
-      await file.writeAsString(row, encoding: utf8, flush: true);
-      //sink.flush();
-      //sink.close();
+
+      //TODO check unicode issue
+      await file.writeAsString(buffer.toString(), encoding: utf8, flush: true);
 
       showSnackBarMessage('File saved in $downloadDir', homeScaffoldKey);
     } catch (e) {

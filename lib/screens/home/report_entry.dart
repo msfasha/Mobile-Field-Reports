@@ -106,7 +106,7 @@ class _ReportEntryState extends State<ReportEntry> {
     if (_diskFile != null) {
       or = await _uploadImage();
       if (or.operationCode == OperationResultCodeEnum.Success)
-        _reportImageURL = or.content;
+        _reportImageURL = or.content; //update the file reference
       else if (or.operationCode == OperationResultCodeEnum.Error) {
         showSnackBarMessage(or.message, reportFormScaffoldKey);
         return or;
@@ -215,6 +215,7 @@ class _ReportEntryState extends State<ReportEntry> {
   _cancelCapturedImage() {
     setState(() {
       _imageStatus = imageStatusEnum.NoImage;
+      _reportImageURL = null;
       _diskFile = null;
     });
   }
@@ -426,8 +427,8 @@ class _ReportEntryState extends State<ReportEntry> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    DisplayImage(File(
-                                                        _diskFile.path))));
+                                                    DisplayImage(
+                                                        File(_diskFile.path))));
                                       } else {
                                         setState(() => _loadingEffect = true);
                                         File file =

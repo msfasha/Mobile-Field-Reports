@@ -23,6 +23,7 @@ add to user profile:
 admin functionalities, perissiom system.
 End application, exit from memory.
 Change organization to agency.
+Display report when clicking on a map point/map listing screen.
 Checkup todos.
 
 

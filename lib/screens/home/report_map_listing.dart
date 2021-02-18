@@ -8,7 +8,6 @@ import 'package:ufr/models/report.dart';
 import 'package:ufr/shared/globals.dart';
 
 class ReportMapListing extends StatefulWidget {
-
   ReportMapListing();
   @override
   State<ReportMapListing> createState() => ReportMapListingState();
@@ -38,27 +37,28 @@ class ReportMapListingState extends State<ReportMapListing> {
   @override
   Widget build(BuildContext context) {
     _markers.clear();
-    return Consumer<List<Report>>(builder: (context, reports, _) {
-      reports.forEach((report) {
-        if (report.locationGeoPoint != null) {
-          _markers.add(Marker(
-              markerId: MarkerId(report.rid),
-              position: LatLng(report.locationGeoPoint.latitude,
-                  report.locationGeoPoint.longitude)));
-        }
-      });
 
-      return GoogleMap(
-        mapType: MapType.normal,
-        myLocationButtonEnabled: Globals.locationPerissionGranted,
-        myLocationEnabled: Globals.locationPerissionGranted,
-        initialCameraPosition: _cameraPosition,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
-        markers: _markers,
-        onTap: (point) {},
-      );
+    final reports = Provider.of<List<Report>>(context);
+
+    reports.forEach((report) {
+      if (report.locationGeoPoint != null) {
+        _markers.add(Marker(
+            markerId: MarkerId(report.rid),
+            position: LatLng(report.locationGeoPoint.latitude,
+                report.locationGeoPoint.longitude)));
+      }
     });
+
+    return GoogleMap(
+      mapType: MapType.normal,
+      myLocationButtonEnabled: Globals.locationPerissionGranted,
+      myLocationEnabled: Globals.locationPerissionGranted,
+      initialCameraPosition: _cameraPosition,
+      onMapCreated: (GoogleMapController controller) {
+        _controller.complete(controller);
+      },
+      markers: _markers,
+      onTap: (point) {},
+    );
   }
 }

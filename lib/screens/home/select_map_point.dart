@@ -7,26 +7,26 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ufr/shared/globals.dart';
 import 'package:ufr/shared/modules.dart';
 
-enum MapReportPointUseModeEnum { AllowSelect, NoSelect }
+enum SelectMapPointUseModeEnum { AllowSelect, NoSelect }
 
-class MapReportPoint extends StatefulWidget {
+class SelectMapPoint extends StatefulWidget {
   final GeoPoint selectedGeoPoint;
-  final MapReportPointUseModeEnum useMode;
+  final SelectMapPointUseModeEnum useMode;
 
-  MapReportPoint({this.selectedGeoPoint, this.useMode});
+  SelectMapPoint({this.selectedGeoPoint, this.useMode});
 
   @override
-  State<MapReportPoint> createState() =>
-      MapReportPointState(selectedGeoPoint: selectedGeoPoint);
+  State<SelectMapPoint> createState() =>
+      SelectMapPointState(selectedGeoPoint: selectedGeoPoint);
 }
 
-class MapReportPointState extends State<MapReportPoint> {
+class SelectMapPointState extends State<SelectMapPoint> {
   GeoPoint selectedGeoPoint;
   Set<Marker> _markers = HashSet<Marker>();
   Completer<GoogleMapController> _controller = Completer();
   CameraPosition _cameraPosition;
 
-  MapReportPointState({this.selectedGeoPoint});
+  SelectMapPointState({this.selectedGeoPoint});
 
   @override
   void initState() {
@@ -73,7 +73,7 @@ class MapReportPointState extends State<MapReportPoint> {
             },
             markers: _markers,
             onTap: (point) {
-              if (widget.useMode == MapReportPointUseModeEnum.AllowSelect) {
+              if (widget.useMode == SelectMapPointUseModeEnum.AllowSelect) {
                 setState(() {
                   _markers.clear();
                   _markers.add(Marker(
@@ -85,7 +85,7 @@ class MapReportPointState extends State<MapReportPoint> {
           ),
           Align(
               alignment: Alignment.bottomCenter,
-              child: widget.useMode == MapReportPointUseModeEnum.AllowSelect
+              child: widget.useMode == SelectMapPointUseModeEnum.AllowSelect
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[

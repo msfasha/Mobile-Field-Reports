@@ -27,16 +27,19 @@ class _HomeDrawerState extends State<HomeDrawer> {
     try {
       await AuthService.signOut();
     } on Exception catch (e) {
-      //TODO need to remove print to something else
-      print(e.toString());
+      showSnackBarMessage('Error occured: ' + e.toString(), homeScaffoldKey);
     }
   }
 
   _exitApplication() async {
     try {
       SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-    } on Exception catch (e) {
-      print(e.toString());
+    } catch (e, s) {
+      logInFireStore(
+          exception: e,
+          stacktrace: s,
+          context: context,
+          source: '_exitApplication');
     }
   }
 

@@ -100,8 +100,8 @@ class ExportFromFireStore {
       //sink.close();
 
       showSnackBarMessage('File saved in $downloadDir', homeScaffoldKey);
-    } on Exception catch (e) {
-      showSnackBarMessage('Error occured: ${e.toString()}', homeScaffoldKey);
+    } catch (e) {
+      showSnackBarMessage('error occured: ' + e.toString(), homeScaffoldKey);
     }
   }
 }

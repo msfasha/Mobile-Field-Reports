@@ -47,9 +47,9 @@ class _ReportTileListingState extends State<ReportTileListing> {
                         MaterialPageRoute(
                             builder: (context) => DisplayImage(file)));
                     setState(() => _loadingEffect = false);
-                  } on Exception {
+                  } catch (e) {
                     showSnackBarMessage(
-                        'Image cannot be displayed', homeScaffoldKey);
+                        'error occured: ' + e.toString(), homeScaffoldKey);
                   }
                 },
               )
@@ -91,7 +91,8 @@ class _ReportTileListingState extends State<ReportTileListing> {
                       OperationResult or;
                       setState(() => _loadingEffect = true);
 
-                      or = await DataService.getPersonNameByUserId(report.userId);
+                      or = await DataService.getPersonNameByUserId(
+                          report.userId);
                       String personName;
 
                       if (or.operationCode == OperationResultCodeEnum.Success)

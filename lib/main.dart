@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:ufr/screens/authenticate/wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,25 +16,39 @@ void main() async {
 
   FlutterError.onError = (FlutterErrorDetails details) {
     //this line prints the default flutter gesture caught exception in console
-    FlutterError.dumpErrorToConsole(details);
-    print(
-        "Error From INSIDE FRAME_WORK :  ${details.exception} ${details.stack}");
+    //FlutterError.dumpErrorToConsole(details);
+
+    logInFireStore(
+      logType: LogTypeEnum.Error,
+      source: 'FlutterError.onError = (FlutterErrorDetails details)',
+      message: TextTreeRenderer(
+        wrapWidth: 100,
+        wrapWidthProperties: 100,
+        maxDescendentsTruncatableNode: 10,
+      )
+          .render(details.toDiagnosticsNode(style: DiagnosticsTreeStyle.error))
+          .trimRight(),
+      exception: details.exception,
+      stacktrace: details.stack,
+    );
   };
 
   //Displayed instead of red screen
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return Material(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 50),
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(''),
-          ),
-          body: SafeArea(
-            child: Text(
-              'Something went wrong, please try again or inform support if the problem persists!' +
-                  details.exception.toString(),
-              style: TextStyle(fontSize: 20, color: Colors.grey),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Center(child: Text('System Notification')),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Builder(
+              builder: (context) {
+                return Text(
+                    'Something went wrong, please try again.\n\nIf the problem persists, please call system support.',
+                    style: TextStyle(fontSize: 16, color: Colors.grey));
+              },
             ),
           ),
         ),
@@ -47,6 +62,12 @@ void main() async {
   }, // starting point of app
       (error, stackTrace) {
     print("Error FROM OUT_SIDE FRAMEWORK :  $error $stackTrace");
+    logInFireStore(
+      logType: LogTypeEnum.Error,
+      source: 'runZonedGuarded',
+      exception: error,
+      stacktrace: stackTrace,
+    );
   });
 }
 
@@ -68,8 +89,7 @@ class MyApp extends StatelessWidget {
     getAgencies();
     return StreamProvider<UserProfile>.value(
       value: AuthService.user,
-      catchError: (context, e) {
-        print('MyApp Error: ' + e.toString());
+      catchError: (context, error) {
         return null;
       },
       child: MaterialApp(

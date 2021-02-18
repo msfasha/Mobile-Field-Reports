@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ufr/models/report.dart';
 import 'package:ufr/screens/home/display_image.dart';
-import 'package:ufr/screens/home/map_report_point.dart';
-import 'package:ufr/shared/firebase_services.dart';
+import 'package:ufr/screens/home/select_map_point.dart';
 import 'package:ufr/shared/loading.dart';
 import 'package:ufr/shared/modules.dart';
 
@@ -35,7 +34,6 @@ class _ReportDisplayState extends State<ReportDisplay> {
         key: reportFormScaffoldKey,
         appBar: AppBar(
           title: Text('Report Information'),
-          backgroundColor: Colors.blue[400],
           elevation: 0.0,
         ),
         body: _loadingEffect == true
@@ -47,7 +45,9 @@ class _ReportDisplayState extends State<ReportDisplay> {
                     child: Text(
                       'Report Time',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.blue),
+                      style: TextStyle(
+                        color: Theme.of(context).accentColor,
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -64,7 +64,9 @@ class _ReportDisplayState extends State<ReportDisplay> {
                   Text(
                     'Address',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
                   SizedBox(
                     height: 5,
@@ -78,7 +80,9 @@ class _ReportDisplayState extends State<ReportDisplay> {
                   Text(
                     'Cause',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
                   SizedBox(
                     height: 5,
@@ -92,7 +96,9 @@ class _ReportDisplayState extends State<ReportDisplay> {
                   Text(
                     'Diameter',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
                   SizedBox(
                     height: 5,
@@ -106,7 +112,9 @@ class _ReportDisplayState extends State<ReportDisplay> {
                   Text(
                     'Location',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
                   SizedBox(
                     height: 5,
@@ -130,18 +138,17 @@ class _ReportDisplayState extends State<ReportDisplay> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => MapReportPoint(
+                                    builder: (context) => SelectMapPoint(
                                           selectedGeoPoint:
                                               widget.report.locationGeoPoint,
-                                          useMode: MapReportPointUseModeEnum
+                                          useMode: SelectMapPointUseModeEnum
                                               .NoSelect,
                                         )),
                               );
                             } catch (e) {
-                              logInFireStore(
-                                  message: e.toString(),
-                                  logType: LogTypeEnum.Error,
-                                  context: context);
+                              showSnackBarMessage(
+                                  'error occured: ' + e.toString(),
+                                  homeScaffoldKey);
                             }
                           }),
                     ],
@@ -152,7 +159,9 @@ class _ReportDisplayState extends State<ReportDisplay> {
                   Text(
                     'Material',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
                   SizedBox(
                     height: 5,
@@ -166,7 +175,9 @@ class _ReportDisplayState extends State<ReportDisplay> {
                   Text(
                     'Image',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
                   SizedBox(
                     height: 5,
@@ -185,10 +196,11 @@ class _ReportDisplayState extends State<ReportDisplay> {
                                       builder: (context) =>
                                           DisplayImage(file)));
                               setState(() => _loadingEffect = false);
-                            } on Exception {
+                            } catch (e) {
                               setState(() => _loadingEffect = false);
                               showSnackBarMessage(
-                                  'Can not display image', homeScaffoldKey);
+                                  'error occured: ' + e.toString(),
+                                  homeScaffoldKey);
                             }
                           })
                       : Text('No image attached to this report',
@@ -200,7 +212,9 @@ class _ReportDisplayState extends State<ReportDisplay> {
                   Text(
                     'User name',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
                   SizedBox(
                     height: 5,
@@ -211,15 +225,18 @@ class _ReportDisplayState extends State<ReportDisplay> {
                   SizedBox(
                     height: 30,
                   ),
-                  RaisedButton(
-                      color: Colors.blue[400],
-                      child: Text(
-                        'Close',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      }),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RaisedButton(
+                          child: Text(
+                            'Close',
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          }),
+                    ],
+                  ),
                 ]),
               ));
   }

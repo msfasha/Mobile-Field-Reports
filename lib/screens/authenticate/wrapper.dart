@@ -7,18 +7,14 @@ import 'package:provider/provider.dart';
 class Wrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    try {
-      final userProfile = Provider.of<UserProfile>(context);
+    final userProfile = Provider.of<UserProfile>(context);
 
-      if (userProfile == null) {
-        return SignIn();
-      } else if (userProfile.userStatus == false) {
-        return SignIn();
-      } else {
-        return Home();
-      }
-    } on Exception catch (e) {
-      throw e;
+    if (userProfile == null) {
+      return SignIn();
+    } else if (userProfile.userStatus == false) {
+      return SignIn();
+    } else {
+      return Home();
     }
   }
 }

@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:ufr/models/report.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as authLib;
 import 'package:ufr/models/user_profile.dart';
+import 'package:crypto/crypto.dart';
 
 import 'modules.dart';
 
@@ -32,14 +35,10 @@ Future<UserProfile> extractUserProfileForFirebaseUser(authLib.User user) async {
 
     UserProfile userProfile = mapFirebaseUserToUserProfile(userProfileDoc);
     userProfile.agencyName = await DataService.getAgencyNameByAgencyId(
-            userProfileDoc.data()['agency_id'])
-        .then((value) {
-      return value.data()['name'];
-    });
+        userProfileDoc.data()['agency_id']);
 
     return userProfile;
-  } on Exception catch (e) {
-    logInFireStore(message: e.toString(), logType: LogTypeEnum.Error);
+  } catch (e) {
     return null;
   }
 }
@@ -51,23 +50,100 @@ enum LogTypeEnum {
 }
 Future<void> logInFireStore(
     {LogTypeEnum logType,
+    dynamic exception,
+    StackTrace stacktrace,
+    String source,
     String message,
     BuildContext context,
-    String reportId}) {
+    String reportId}) async {
   try {
-    UserProfile userProfile;
-    if (context != null) userProfile = Provider.of<UserProfile>(context);
+    int errorCount = 1;
+    String strippedStackTrace;
+    String hashCode;
+    String docId; //will be used if we need to update an existing document
 
-    return FirebaseFirestore.instance.collection('logs').add({
-      'log_type': logType,
-      'message': message,
-      'user_id': userProfile != null ? userProfile.userId : null,
-      'report_id': reportId != null ? reportId : null,
+    UserProfile userProfile;
+    if (context != null)
+      userProfile = Provider.of<UserProfile>(context, listen: false);
+
+//prepare document, if the error is repeated, informaton about the last
+//error will overwrite the previous error details i.e. time, source, user...etc,
+//and the error count will be incremented
+    Map<String, dynamic> logDoc = {
       'time': DateTime.now(),
-    });
-  } on Exception catch (e) {
-    print(e.toString());
-    return null;
+      'log_type':
+          logType == null ? LogTypeEnum.Error.toString() : logType.toString(),
+      'exception': exception?.toString(),
+      'exception object type': exception?.runtimeType.toString(),
+
+      'stripped_stack_trace': null,
+      //TODO, this sould be removed in production, it is here just for debugging purposes.
+      'stack_trace': null,
+      'hash_code': null,
+      'error_count': 1,
+
+      'source': source,
+      'message': message,
+      'user_email': userProfile?.email,
+      'user_agency': userProfile?.agencyName,
+      'report_id': reportId,
+    };
+
+    //calculate the hash code for the stacktrace, and check if this error is already registered.
+    //if it is already registered, then just increment the error count.
+    if (stacktrace != null) {
+      //just take the first line of the stack trace, usually this contains the name of the code unit
+      List<String> splitStackTrace = stacktrace.toString().split('#');
+      splitStackTrace.remove("");
+      strippedStackTrace = splitStackTrace.getRange(0, 4).toString();
+      hashCode = md5.convert(utf8.encode(strippedStackTrace)).toString();
+
+      //store a splitted version of the full stack trace, for debuggin purposes
+      //TODO, this sould be removed in production, it is here just for debugging purposes.
+      logDoc.update('stack_trace', (value) {
+        return splitStackTrace;
+      });
+
+      //set the stripped stack trace value
+      logDoc.update('stripped_stack_trace', (value) {
+        return strippedStackTrace;
+      });
+      //update the initial hashcode
+      logDoc.update('hash_code', (value) {
+        return hashCode;
+      });
+
+      QuerySnapshot qs = await FirebaseFirestore.instance
+          .collection('logs')
+          .where('hash_code', isEqualTo: hashCode)
+          .get();
+
+      //check if this document/hashcode is already stored
+      if (qs.size > 0) {
+        //get the document id so that we can update this document later
+        docId = qs.docs[0].id;
+
+        //since this error is already registered, just increase the counter
+        errorCount = qs.docs[0].data()['error_count'] + 1;
+
+        //update/increment the existing error counter
+        logDoc.update('error_count', (value) {
+          return errorCount;
+        });
+      }
+    }
+
+    if (docId != null)
+      await FirebaseFirestore.instance
+          .collection('logs')
+          .doc(docId)
+          .update(logDoc);
+    else
+      await FirebaseFirestore.instance.collection('logs').add(logDoc);
+
+    print('..... error logged in firebase.');
+  } catch (e) {
+    print('..... logger error: ' + e.toString());
   }
 }
 
@@ -79,8 +155,7 @@ class AuthService {
           authLib.FirebaseAuth.instance.authStateChanges();
       return myStream
           .asyncMap((event) => extractUserProfileForFirebaseUser(event));
-    } on Exception catch (e) {
-      logInFireStore(message: e.toString(), logType: LogTypeEnum.Error);
+    } catch (e) {
       return null;
     }
   }
@@ -162,7 +237,7 @@ class AuthService {
       if (authLib.FirebaseAuth.instance.currentUser != null)
         await authLib.FirebaseAuth.instance.signOut();
     } catch (e) {
-      throw e;
+      showSnackBarMessage('error occured: ' + e.toString(), homeScaffoldKey);
     }
   }
 }
@@ -200,12 +275,14 @@ class DataService {
     }
   }
 
-  static Future<DocumentSnapshot> getAgencyNameByAgencyId(String agencyId) {
+  static Future<String> getAgencyNameByAgencyId(String agencyId) async {
     try {
-      return FirebaseFirestore.instance
+      DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('agency')
           .doc(agencyId)
           .get();
+
+      return doc.data()['name'];
     } on Exception catch (e) {
       throw e;
     }

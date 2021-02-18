@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'package:ufr/models/report.dart';
 import 'package:ufr/models/user_profile.dart';
-import 'package:ufr/screens/home/map_report_point.dart';
+import 'package:ufr/screens/home/select_map_point.dart';
 import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/globals.dart';
 import 'package:ufr/shared/loading.dart';
@@ -141,9 +141,9 @@ class _ReportEntryState extends State<ReportEntry> {
       final GeoPoint result = await Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => MapReportPoint(
+            builder: (context) => SelectMapPoint(
                 selectedGeoPoint: _reportLocationGeoPoint,
-                useMode: MapReportPointUseModeEnum.AllowSelect)),
+                useMode: SelectMapPointUseModeEnum.AllowSelect)),
       );
 
       if (result != null) {
@@ -153,8 +153,9 @@ class _ReportEntryState extends State<ReportEntry> {
               result.latitude.toString() + " , " + result.longitude.toString();
         });
       }
-    } on Exception catch (e) {
-      showSnackBarMessage(e.toString(), reportFormScaffoldKey);
+    } catch (e) {
+      showSnackBarMessage(
+          'error occured: ' + e.toString(), reportFormScaffoldKey);
     }
   }
 
@@ -207,7 +208,8 @@ class _ReportEntryState extends State<ReportEntry> {
         });
       }
     } on Exception catch (e) {
-      showSnackBarMessage(e.toString(), reportFormScaffoldKey);
+      showSnackBarMessage(
+          'error occured: ' + e.toString(), reportFormScaffoldKey);
     }
   }
 
@@ -249,7 +251,8 @@ class _ReportEntryState extends State<ReportEntry> {
                 ]));
           });
     } on Exception catch (e) {
-      showSnackBarMessage(e.toString(), reportFormScaffoldKey);
+      showSnackBarMessage(
+          'error occured: ' + e.toString(), reportFormScaffoldKey);
     }
   }
 
@@ -261,7 +264,8 @@ class _ReportEntryState extends State<ReportEntry> {
         currentFocus.unfocus();
       }
     } on Exception catch (e) {
-      showSnackBarMessage(e.toString(), reportFormScaffoldKey);
+      showSnackBarMessage(
+          'error occured: ' + e.toString(), reportFormScaffoldKey);
     }
   }
 
@@ -436,10 +440,10 @@ class _ReportEntryState extends State<ReportEntry> {
                                                     DisplayImage(file)));
                                         setState(() => _loadingEffect = false);
                                       }
-                                    } on Exception {
+                                    } catch (e) {
                                       setState(() => _loadingEffect = false);
                                       showSnackBarMessage(
-                                          'Can not display the image',
+                                          'error occured: ' + e.toString(),
                                           homeScaffoldKey);
                                     }
                                   })

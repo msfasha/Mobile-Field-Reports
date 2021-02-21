@@ -16,7 +16,7 @@ void main() async {
 
   FlutterError.onError = (FlutterErrorDetails details) {
     //this line prints the default flutter gesture caught exception in console
-    //FlutterError.dumpErrorToConsole(details);
+    FlutterError.dumpErrorToConsole(details);
 
     logInFireStore(
       logType: LogTypeEnum.Error,

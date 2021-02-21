@@ -34,14 +34,10 @@ class _HomeState extends State<Home> {
         if (locationPermissionStatus != PermissionStatus.granted)
           showSnackBarMessage(
               'No permission to use location services', reportFormScaffoldKey);
-
-        setState(() {
-          Globals.locationPerissionGranted =
-              locationPermissionStatus == PermissionStatus.granted
-                  ? true
-                  : false;
-        });
       }
+
+      Globals.locationPerissionGranted =
+          locationPermissionStatus == PermissionStatus.granted ? true : false;
     } on Exception catch (e) {
       showSnackBarMessage(
           'error occured: ' + e.toString(), reportFormScaffoldKey);

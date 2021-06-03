@@ -1,4 +1,4 @@
-A flutter App to collect reviews from the field.
+A Flutter App to assist in conducting surveys for utilities.
 
 A new Flutter project.
 

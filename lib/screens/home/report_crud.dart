@@ -43,7 +43,7 @@ class _ReportCrudScreenState extends State<ReportCrudScreen> {
   late CrudOperationTypeEnum _crudOperationType;
 
   String? _reportLocationGpsString;
-  PickedFile? _diskFile;
+  XFile? _diskFile;
 
   @override
   void initState() {
@@ -152,10 +152,11 @@ class _ReportCrudScreenState extends State<ReportCrudScreen> {
       if (diskFile != null) {
         setState(() {
           _imageStatus = ImageStatusEnum.newImageCaptured;
-          _diskFile = diskFile as PickedFile?;
+          _diskFile = diskFile;
+          // _diskFile = diskFile as PickedFile?;
         });
       }
-    } on Exception catch (e) {
+    } catch (e) {
       if (context.mounted) {
         showSnackBarMessage(context, 'error occurred: $e');
       }
@@ -425,8 +426,7 @@ class _ReportCrudScreenState extends State<ReportCrudScreen> {
                                 } catch (e) {
                                   setState(() => _loadingEffect = false);
                                   if (context.mounted) {
-                                    showSnackBarMessage(
-                                        context, 'Report successfully saved');
+                                    showSnackBarMessage(context, e.toString());
                                   }
                                 }
                               }),

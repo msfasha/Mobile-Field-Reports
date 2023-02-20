@@ -5,23 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "ufr profile",
-            "type": "dart",
+            "name": "Mobile-Field-Reports",
             "request": "launch",
-            "program": "lib/main.dart",
+            "type": "dart"
+        },
+        {
+            "name": "Mobile-Field-Reports (profile mode)",
+            "request": "launch",
+            "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "ufr release",
+            "name": "Mobile-Field-Reports (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
-        },
-        {
-            "name": "ufr debug",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "debug",    
         }
     ]
 }

@@ -85,8 +85,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 );
               });
 
-              ExportFromFireStore.exportToCSV(user.agencyId, context)
-                  .then((value) => Navigator.pop(context));
+              ExportFromFireStore.exportToCSV(user.agencyId, context);
+              // .then((value) => Navigator.pop(context));
             },
           ),
           (user.userCategory == UserCategoryBaseEnum.sysAdmin.value)

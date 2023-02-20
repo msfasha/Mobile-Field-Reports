@@ -73,12 +73,10 @@ class ExportFromFireStore {
 
       if (context.mounted) {
         showSnackBarMessage(context, 'File saved in $downloadDir');
-        Navigator.pop(context);
       }
     } catch (e) {
       if (context.mounted) {
         showSnackBarMessage(context, 'error occurred: $e');
-        Navigator.pop(context);
       }
     }
   }

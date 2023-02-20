@@ -1,22 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Report {
-  String rid;
+class ReportCls {
+  String? rid;
   String userId;
   String agencyId;
   Timestamp time;
-  String address;
-  GeoPoint locationGeoPoint;
-  String imageURL;
-  String material;
-  int diameter;
-  String cause;
+  String? address;
+  GeoPoint? locationGeoPoint;
+  String? imageURL;
+  String? material;
+  int? diameter;
+  String? cause;
 
-  Report(
+  ReportCls(
       {this.rid,
-      this.userId,
-      this.agencyId,
-      this.time,
+      required this.userId,
+      required this.agencyId,
+      required this.time,
       this.address,
       this.locationGeoPoint,
       this.imageURL,

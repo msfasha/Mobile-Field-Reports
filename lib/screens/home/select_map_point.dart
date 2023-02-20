@@ -7,26 +7,24 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ufr/shared/globals.dart';
 import 'package:ufr/shared/modules.dart';
 
-enum SelectMapPointUseModeEnum { AllowSelect, NoSelect }
+enum SelectMapPointUseModeEnum { allowSelect, noSelect }
 
 class SelectMapPoint extends StatefulWidget {
-  final GeoPoint selectedGeoPoint;
+  final GeoPoint? initialGeoPoint;
   final SelectMapPointUseModeEnum useMode;
 
-  SelectMapPoint({this.selectedGeoPoint, this.useMode});
+  const SelectMapPoint(
+      {super.key, this.initialGeoPoint, required this.useMode});
 
   @override
-  State<SelectMapPoint> createState() =>
-      SelectMapPointState(selectedGeoPoint: selectedGeoPoint);
+  State<SelectMapPoint> createState() => SelectMapPointState();
 }
 
 class SelectMapPointState extends State<SelectMapPoint> {
-  GeoPoint selectedGeoPoint;
-  Set<Marker> _markers = HashSet<Marker>();
-  Completer<GoogleMapController> _controller = Completer();
-  CameraPosition _cameraPosition;
-
-  SelectMapPointState({this.selectedGeoPoint});
+  final Set<Marker> _markers = HashSet<Marker>();
+  final Completer<GoogleMapController> _controller = Completer();
+  late CameraPosition _cameraPosition;
+  GeoPoint? _selectedGeoPoint;
 
   @override
   void initState() {
@@ -35,18 +33,19 @@ class SelectMapPointState extends State<SelectMapPoint> {
   }
 
   void _setInitialCameraPosition() {
-    if (selectedGeoPoint != null) {
+    if (widget.initialGeoPoint != null) {
       _cameraPosition = (CameraPosition(
-        target: LatLng(selectedGeoPoint.latitude, selectedGeoPoint.longitude),
+        target: LatLng(widget.initialGeoPoint!.latitude,
+            widget.initialGeoPoint!.longitude),
         zoom: 17,
       ));
       _markers.add(Marker(
-          markerId: MarkerId("report_location"),
-          position:
-              LatLng(selectedGeoPoint.latitude, selectedGeoPoint.longitude)));
+          markerId: const MarkerId("report_location"),
+          position: LatLng(widget.initialGeoPoint!.latitude,
+              widget.initialGeoPoint!.longitude)));
     } else {
       //just zoom over Jordan
-      _cameraPosition = CameraPosition(
+      _cameraPosition = const CameraPosition(
         target: LatLng(31.9, 35.9),
         zoom: 8,
       );
@@ -56,9 +55,8 @@ class SelectMapPointState extends State<SelectMapPoint> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: customMapScafoldKey,
       appBar: AppBar(
-        title: Text('Select Location'),
+        title: const Text('Select Location'),
         elevation: 0.0,
       ),
       body: Stack(
@@ -73,58 +71,60 @@ class SelectMapPointState extends State<SelectMapPoint> {
             },
             markers: _markers,
             onTap: (point) {
-              if (widget.useMode == SelectMapPointUseModeEnum.AllowSelect) {
+              if (widget.useMode == SelectMapPointUseModeEnum.allowSelect) {
                 setState(() {
                   _markers.clear();
                   _markers.add(Marker(
-                      markerId: MarkerId("report_location"), position: point));
-                  selectedGeoPoint = GeoPoint(point.latitude, point.longitude);
+                      markerId: const MarkerId("report_location"),
+                      position: point));
+                  _selectedGeoPoint = GeoPoint(point.latitude, point.longitude);
                 });
               }
             },
           ),
           Align(
               alignment: Alignment.bottomCenter,
-              child: widget.useMode == SelectMapPointUseModeEnum.AllowSelect
+              child: widget.useMode == SelectMapPointUseModeEnum.allowSelect
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                          RaisedButton(
-                              color: Colors.black54,
+                          ElevatedButton(
                               onPressed: () {
-                                if (selectedGeoPoint == null) {
-                                  showSnackBarMessage(
-                                      'No point selected', customMapScafoldKey);
-                                } else
-                                  Navigator.pop(context, selectedGeoPoint);
+                                if (_selectedGeoPoint == null) {
+                                  if (context.mounted) {
+                                    showSnackBarMessage(
+                                        context, 'No point selected');
+                                    Navigator.pop(context);
+                                  }
+                                } else {
+                                  Navigator.pop(context, _selectedGeoPoint);
+                                }
                               },
-                              child: Text(
+                              child: const Text(
                                 'Ok',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white),
                               )),
-                          SizedBox(
+                          const SizedBox(
                             width: 5,
                           ),
-                          RaisedButton(
-                              color: Colors.black54,
+                          ElevatedButton(
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: Text(
+                              child: const Text(
                                 'Cancel',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white),
                               ))
                         ])
-                  : RaisedButton(
-                      color: Colors.black54,
+                  : ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text(
+                      child: const Text(
                         'Close',
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: Colors.white),

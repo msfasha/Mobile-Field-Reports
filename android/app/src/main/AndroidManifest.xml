@@ -1,23 +1,28 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.ufr">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!--Seems we need the below setting to force showing ANDROID system Allow Using Location when 
+    we start our application, if the user selected refuse, we can ask him again using the get permission
+    mechanism inside the designated screen.
+    Once I entered these two options belows, the system permission screen appeared immediately after I
+    started the application-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
 
    <application
         android:label="ufr"
+        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
+        <!--#@@# I got this key from google services after I connected google account to a billing service
+        I guess if you have a new account with 300$ free trial period, this setting might not be needed-->
         <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyDIkVHpxrkELbg0nFtS8GTItdNg0FmFeoY"/>                       
-
+            android:value="AIzaSyBEvsb_zzUy8NAD-jlonvosxKOcE8al9ZE"/>
+            
         <activity
             android:name=".MainActivity"
+            android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -30,15 +35,6 @@
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
-              />
-            <!-- Displays an Android View that continues showing the launch screen
-                 Drawable until Flutter paints its first frame, then this splash
-                 screen fades out. A splash screen is useful to avoid any visual
-                 gap between the end of Android's launch screen and the painting of
-                 Flutter's first frame. -->
-            <meta-data
-              android:name="io.flutter.embedding.android.SplashScreenDrawable"
-              android:resource="@drawable/launch_background"
               />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

@@ -8,16 +8,16 @@ import 'package:ufr/models/report.dart';
 import 'package:ufr/shared/globals.dart';
 
 class ReportMapListing extends StatefulWidget {
-  ReportMapListing();
+  const ReportMapListing({super.key});
   @override
   State<ReportMapListing> createState() => ReportMapListingState();
 }
 
 class ReportMapListingState extends State<ReportMapListing> {
   //Location location = new Location();
-  Set<Marker> _markers = HashSet<Marker>();
-  Completer<GoogleMapController> _controller = Completer();
-  CameraPosition _cameraPosition;
+  final Set<Marker> _markers = HashSet<Marker>();
+  final Completer<GoogleMapController> _controller = Completer();
+  late CameraPosition _cameraPosition;
 
   @override
   void initState() {
@@ -27,8 +27,8 @@ class ReportMapListingState extends State<ReportMapListing> {
   }
 
   void _setInitialCameraPosition() {
-    //just zoom over Jordan
-    _cameraPosition = CameraPosition(
+    //zoom over Jordan
+    _cameraPosition = const CameraPosition(
       target: LatLng(31.9, 35.9),
       zoom: 8,
     );
@@ -38,16 +38,16 @@ class ReportMapListingState extends State<ReportMapListing> {
   Widget build(BuildContext context) {
     _markers.clear();
 
-    final reports = Provider.of<List<Report>>(context);
+    final reports = Provider.of<List<ReportCls>>(context);
 
-    reports.forEach((report) {
+    for (var report in reports) {
       if (report.locationGeoPoint != null) {
         _markers.add(Marker(
-            markerId: MarkerId(report.rid),
-            position: LatLng(report.locationGeoPoint.latitude,
-                report.locationGeoPoint.longitude)));
+            markerId: MarkerId(report.rid!),
+            position: LatLng(report.locationGeoPoint!.latitude,
+                report.locationGeoPoint!.longitude)));
       }
-    });
+    }
 
     return GoogleMap(
       mapType: MapType.normal,

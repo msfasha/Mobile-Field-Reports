@@ -4,30 +4,36 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:ufr/models/user_profile.dart';
 import 'package:ufr/screens/authenticate/change_password.dart';
 import 'package:ufr/screens/authenticate/user_management.dart';
-import 'package:ufr/shared/firebase_services.dart';
-import 'package:ufr/shared/export.dart';
+import 'package:ufr/screens/home/export.dart';
 import 'package:ufr/shared/modules.dart';
 import 'package:provider/provider.dart';
 
+import '../../shared/aws_authentication_service.dart';
+import '../../shared/aws_data_service.dart';
+
 class HomeDrawer extends StatefulWidget {
+  const HomeDrawer({super.key});
+
   @override
-  _HomeDrawerState createState() => _HomeDrawerState();
+  State<HomeDrawer> createState() => _HomeDrawerState();
 }
 
 class _HomeDrawerState extends State<HomeDrawer> {
-  Widget _exportTitle;
+  late Widget _exportTitle;
 
   @override
   void initState() {
-    _exportTitle = Text('Export to CSV');
+    _exportTitle = const Text('Export to CSV');
     super.initState();
   }
 
   _logout() async {
     try {
-      await AuthService.signOut();
-    } on Exception catch (e) {
-      showSnackBarMessage('Error occured: ' + e.toString(), homeScaffoldKey);
+      await AuthenticationService.signOut();
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBarMessage(context, 'error occurred: $e');
+      }
     }
   }
 
@@ -39,7 +45,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
           exception: e,
           stacktrace: s,
           context: context,
-          source: '_exitApplication');
+          source: '_exitApplication',
+          logType: LogTypeEnum.info,
+          message: '',
+          reportId: '');
     }
   }
 
@@ -53,66 +62,67 @@ class _HomeDrawerState extends State<HomeDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           UserAccountsDrawerHeader(
-            accountName: Text(user.personName ?? ''),
-            accountEmail: Text(user.email) ?? '',
+            accountName: Text(user.personName),
+            accountEmail: Text(user.email),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Theme.of(context).platform == TargetPlatform.iOS
                   ? Colors.blue
                   : Colors.white,
               child: Text(
-                user.email.characters.first ?? '',
-                style: TextStyle(fontSize: 40.0),
+                user.email.characters.first,
+                style: const TextStyle(fontSize: 40.0),
               ),
             ),
           ),
           ListTile(
-            leading: Icon(Icons.save),
+            leading: const Icon(Icons.save),
             title: _exportTitle,
-            onTap: () async {
+            onTap: () {
               setState(() {
                 _exportTitle = SpinKitThreeBounce(
-                  color: Theme.of(context).accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                   size: 20.0,
                 );
               });
 
-              await ExportFromFireStore.exportToCSV(user.agencyId, context);
-
-              Navigator.pop(context);
+              ExportFromFireStore.exportToCSV(user.agencyId, context)
+                  .then((value) => Navigator.pop(context));
             },
           ),
-          (user.userCategory == UserCategoryBaseEnum.SysAdmin.value)
+          (user.userCategory == UserCategoryBaseEnum.sysAdmin.value)
               ? ListTile(
-                  leading: Icon(Icons.verified_user),
-                  title: Text('Manage users'),
+                  leading: const Icon(Icons.verified_user),
+                  title: const Text('Manage users'),
                   onTap: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => UserManagement()));
+                            builder: (context) => const UserManagement()));
                   })
               : Container(),
           ListTile(
-              leading: Icon(Icons.info),
-              title: Text('Change Password'),
+              leading: const Icon(Icons.info),
+              title: const Text('Change Password'),
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ChangePassword()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ChangePassword()));
               }),
           ListTile(
-            leading: Icon(Icons.info),
-            title: Text('About'),
+            leading: const Icon(Icons.info),
+            title: const Text('About'),
             onTap: () {
               showMessageDialog(context, "ME Application");
             },
           ),
           ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Logout'),
+              leading: const Icon(Icons.person),
+              title: const Text('Logout'),
               onTap: _logout),
           ListTile(
-            leading: Icon(Icons.power_settings_new),
-            title: Text('Exit'),
+            leading: const Icon(Icons.power_settings_new),
+            title: const Text('Exit'),
             onTap: _exitApplication,
           ),
         ],

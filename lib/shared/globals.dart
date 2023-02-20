@@ -65,5 +65,5 @@ class Globals {
     'Bad Installation'
   ];
   static bool locationPerissionGranted = false;
-  static QuerySnapshot agenciesSnapshot;
+  static QuerySnapshot? agenciesSnapshot;
 }

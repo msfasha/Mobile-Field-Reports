@@ -2,30 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:ufr/models/user_profile.dart';
-import 'package:ufr/shared/firebase_services.dart';
 import 'package:ufr/shared/loading.dart';
 import 'package:ufr/shared/modules.dart';
 import 'package:ufr/widgets/agency_dropdown.dart';
 
+import '../../shared/aws_data_service.dart';
+
 class UserManagement extends StatefulWidget {
+  const UserManagement({super.key});
+
   @override
-  _UserManagementState createState() => _UserManagementState();
+  State<UserManagement> createState() => _UserManagementState();
 }
 
 class _UserManagementState extends State<UserManagement> {
-  String _agencyId;
-  List<UserProfile> _dataModel = List<UserProfile>();
-  List<bool> _itemSavingEffect;
+  List<UserProfile> _dataModel = <UserProfile>[];
+  List<bool>? _itemSavingEffect;
   bool _loadingEffect = true;
 
-  getUsersList(String agencyId) async {
+  getUsersList(String? agencyId) async {
     setState(() {
       _loadingEffect = true;
     });
 
     OperationResult or;
 
-    //this operation always returns a value, even if agencyId is null
+    //This operation always returns a value, even if agencyId is null
     or = await DataService.getUsersProfilesByAgencyId(agencyId);
 
     setState(() {
@@ -47,23 +49,19 @@ class _UserManagementState extends State<UserManagement> {
     final user = Provider.of<UserProfile>(context);
 
     return SafeArea(
-      child: new Scaffold(
-          key: userManagementScafoldKey,
-          appBar: AppBar(title: Text('Users Management')),
+      child: Scaffold(
+          appBar: AppBar(title: const Text('Users Management')),
           body: Column(
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
-                child: AgencyDropDown(
-                  agencyId: _agencyId, //make sure this is not static
-                  onChanged: (value) {
-                    getUsersList(value);
-                  },
-                ),
+                child: AgencyDropDown((value) {
+                  getUsersList(value);
+                }),
               ),
               Expanded(
                   child: _loadingEffect
-                      ? Loading()
+                      ? const Loading()
                       : ListView.builder(
                           itemCount: _dataModel.length,
                           padding: EdgeInsets.zero,
@@ -72,16 +70,14 @@ class _UserManagementState extends State<UserManagement> {
                             return ListTile(
                               title: Text(
                                 _dataModel[index].email,
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: 0.5),
                               ),
-                              subtitle: new Text(
-                                _dataModel[index].personName +
-                                    ' ' +
-                                    _dataModel[index].phoneNumber,
-                                style: TextStyle(
+                              subtitle: Text(
+                                '${_dataModel[index].personName} ${_dataModel[index].phoneNumber}',
+                                style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: 0.5),
@@ -100,26 +96,27 @@ class _UserManagementState extends State<UserManagement> {
                                                     ? Colors.green
                                                     : Colors.red)),
                                     //put space between text and checkbox/ActivityIndicator
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     //constrain both checkbox/or/activity indicator with a fixed bound
                                     //so that the word/text active stops flipping when the status is changed
                                     SizedBox(
                                       width: 30,
                                       height: 30,
-                                      child: _itemSavingEffect[index] == true
+                                      child: _itemSavingEffect![index] == true
                                           ? SpinKitThreeBounce(
-                                              color:
-                                                  Theme.of(context).accentColor,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .secondary,
                                               size: 20.0,
                                             )
                                           : Checkbox(
                                               value:
                                                   _dataModel[index].userStatus,
-                                              onChanged: (bool val) async {
+                                              onChanged: (bool? val) async {
                                                 setState(() {
                                                   _dataModel[index].userStatus =
-                                                      val;
-                                                  _itemSavingEffect[index] =
+                                                      val ?? false;
+                                                  _itemSavingEffect![index] =
                                                       true;
                                                 });
                                                 OperationResult result =
@@ -127,33 +124,33 @@ class _UserManagementState extends State<UserManagement> {
                                                         .updateUserStatus(
                                                             _dataModel[index]
                                                                 .userId,
-                                                            val,
+                                                            val!,
                                                             user.userId);
 
                                                 setState(() {
-                                                  _itemSavingEffect[index] =
+                                                  _itemSavingEffect![index] =
                                                       false;
                                                 });
 
-                                                //if an error occured, return keep the checkbox state as before
+                                                //if an error occurred, return keep the checkbox state as before
                                                 if (result.operationCode ==
                                                     OperationResultCodeEnum
-                                                        .Error) {
+                                                        .error) {
                                                   setState(() {
                                                     _dataModel[index]
                                                             .userStatus =
-                                                        !_dataModel[index]
+                                                        _dataModel[index]
                                                             .userStatus;
                                                   });
-                                                  showSnackBarMessage(
-                                                      _dataModel[index].email +
-                                                          ' Error occured, status was NOT updated',
-                                                      userManagementScafoldKey);
+                                                  if (context.mounted) {
+                                                    showSnackBarMessage(context,
+                                                        '${_dataModel[index].email} Error occurred, status was NOT updated');
+                                                  }
                                                 } else {
-                                                  showSnackBarMessage(
-                                                      _dataModel[index].email +
-                                                          ' status was updated',
-                                                      userManagementScafoldKey);
+                                                  if (context.mounted) {
+                                                    showSnackBarMessage(context,
+                                                        '${_dataModel[index].email} status was updated');
+                                                  }
                                                 }
                                               }),
                                     ),

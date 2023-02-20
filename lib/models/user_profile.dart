@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserProfile {
   String userId;
   String agencyId;
-  String agencyName;
+  String? agencyName; //value is retreived at runtime based in agency id
   String personName;
   String phoneNumber;
   String email;
@@ -14,15 +14,15 @@ class UserProfile {
   String statusChangedBy;
 
   UserProfile(
-      {this.userId,
-      this.agencyId,
+      {required this.userId,
+      required this.agencyId,
       this.agencyName,
-      this.personName,
-      this.phoneNumber,
-      this.email,
-      this.userCategory, //normal user, agency admin, system admin.
-      this.creationDate,
-      this.userStatus, //true or false, activated and deactivated
-      this.userStatusDate,
-      this.statusChangedBy});
+      required this.personName,
+      required this.phoneNumber,
+      required this.email,
+      required this.userCategory, //normal user, agency admin, system admin.
+      required this.creationDate,
+      required this.userStatus, //true or false, activated and deactivated
+      required this.userStatusDate,
+      required this.statusChangedBy});
 }
